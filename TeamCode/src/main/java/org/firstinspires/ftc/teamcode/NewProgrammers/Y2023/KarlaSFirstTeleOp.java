@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +14,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+@Disabled
 @TeleOp(name= "KarlaSTeleOp", group= "Shared")
 public class KarlaSFirstTeleOp extends OpMode implements OpenCvCamera.AsyncCameraOpenListener {
 

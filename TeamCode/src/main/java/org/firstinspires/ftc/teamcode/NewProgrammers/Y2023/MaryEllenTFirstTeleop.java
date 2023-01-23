@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,6 +19,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+@Disabled
 @TeleOp(name = "Mary Ellen First Teleop", group = "Shared")
 public class MaryEllenTFirstTeleop extends OpMode implements OpenCvCamera.AsyncCameraOpenListener{
 

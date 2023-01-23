@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot.Qual11588BaseAuto;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
+
+@Disabled
 @Autonomous(name = "Qual 11588 Blue Lower Cone and Park", group = "11588")
 public class Qual11588ConeAndParkBlueLower extends Qual11588BaseAuto {
     ElapsedTime timer = new ElapsedTime();

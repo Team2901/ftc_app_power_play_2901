@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Hardware.JuliaBFirstHardware;
 
+@Disabled
 @Autonomous(name= "JuliaBFirstAutoUsingTime")
 public class JuliaBFirstAutoUsingTime extends LinearOpMode {
 

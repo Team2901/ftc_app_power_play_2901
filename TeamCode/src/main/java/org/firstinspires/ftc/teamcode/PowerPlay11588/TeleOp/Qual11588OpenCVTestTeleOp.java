@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
+
+@Disabled
 @TeleOp(name = "OCV Qual 11588", group = "11588")
 public class Qual11588OpenCVTestTeleOp extends OpMode {
     Qual11588Hardware robot = new Qual11588Hardware();

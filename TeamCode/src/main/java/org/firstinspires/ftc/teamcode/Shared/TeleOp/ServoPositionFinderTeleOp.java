@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Shared.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
+@Disabled
 @TeleOp(name = "servo position finder", group = "test")
 public class ServoPositionFinderTeleOp extends OpMode {
     RockBotHardware robot = new RockBotHardware();

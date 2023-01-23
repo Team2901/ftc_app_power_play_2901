@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.GreenTeam.SavedCode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.GreenTeam.SavedCode.SidearmGreenBaseAuto;
 import org.firstinspires.ftc.teamcode.GreenTeam.SavedCode.SidearmGreenHardware;
 
+@Disabled
 @Autonomous (name = "Sidearm Red Upper", group = "Green")
 public class SidearmGreenRedUpper extends SidearmGreenBaseAuto {
     ElapsedTime runtime = new ElapsedTime();

@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
 import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Hardware.NickJFIrstHardware;
 
-
+@Disabled
 @Autonomous(name = "Nick Jerden First Auto")
 public class NickJFirstAuto extends LinearOpMode {
 

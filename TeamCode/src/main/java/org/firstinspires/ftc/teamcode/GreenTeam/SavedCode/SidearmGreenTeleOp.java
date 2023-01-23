@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.GreenTeam.SavedCode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Disabled
 @TeleOp(name = "Sidearm Green TeleOp", group = "Green")
 public class SidearmGreenTeleOp extends OpMode {
     SidearmGreenHardware robot = new SidearmGreenHardware();
