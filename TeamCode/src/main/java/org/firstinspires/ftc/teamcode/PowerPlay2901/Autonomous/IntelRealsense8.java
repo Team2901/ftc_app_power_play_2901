@@ -548,6 +548,7 @@ public class IntelRealsense8 extends OpMode {
             robot.rightOne.setVelocity(0);
             robot.rightTwo.setVelocity(0);
         } else {
+            outputRight*=1.06;
             robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
             robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
             robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);

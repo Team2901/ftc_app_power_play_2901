@@ -106,10 +106,10 @@ public class SampleTankDrive extends TankDrive {
 
 
         // add/remove motors depending on your robot (e.g., 6WD)
-        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "left 2");
-        DcMotorEx leftRear = hardwareMap.get(DcMotorEx.class, "left 1");
-        DcMotorEx rightRear = hardwareMap.get(DcMotorEx.class, "right 1");
-        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "right 2");
+        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "left 1");
+        DcMotorEx leftRear = hardwareMap.get(DcMotorEx.class, "left 2");
+        DcMotorEx rightRear = hardwareMap.get(DcMotorEx.class, "right 2");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "right 1");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
         leftMotors = Arrays.asList(leftFront, leftRear);
@@ -209,8 +209,13 @@ public class SampleTankDrive extends TankDrive {
     }
 
     public void waitForIdle() {
-        while (!Thread.currentThread().isInterrupted() && isBusy())
+        while (!Thread.currentThread().isInterrupted() && isBusy()) {
             update();
+        }
+        leftMotors.get(0).setPower(0);
+        leftMotors.get(1).setPower(0);
+        rightMotors.get(0).setPower(0);
+        rightMotors.get(1).setPower(0);
     }
 
     public boolean isBusy() {
@@ -286,12 +291,68 @@ public class SampleTankDrive extends TankDrive {
 
     @Override
     public void setMotorPowers(double v, double v1) {
-        for (DcMotorEx leftMotor : leftMotors) {
-            leftMotor.setPower(v);
+        double leftTurnPower = leftPodTurn(0);
+        double rightTurnPower = rightPodTurn(0);
+        leftMotors.get(0).setPower(v - leftTurnPower);
+        leftMotors.get(1).setPower(-(v + leftTurnPower));
+        rightMotors.get(0).setPower(v - rightTurnPower);
+        rightMotors.get(1).setPower(-(v + rightTurnPower));
+    }
+
+    double leftPodAngle = 0;
+    double pAngleLeft = 0;
+    double iAngleLeft = 0;
+    double dAngleLeft = 0;
+
+    double kpPod = .6;
+    double kiPod = 0;
+    double kdPod = 0;
+
+    public double leftPodTurn(double angle) {
+        leftPodAngle = (leftMotors.get(0).getCurrentPosition() + leftMotors.get(1).getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
+        /*double secs = runtimePodLeft.seconds();
+        runtimePodLeft.reset();
+        dAngleLeft = (error - pAngleLeft) / secs;
+        iAngleLeft = iAngleLeft + (error * secs);*/
+        pAngleLeft = error;
+        double total = (kpPod * pAngleLeft + kiPod * iAngleLeft + kdPod * dAngleLeft) / 100;
+        if (total > 1) {
+            iAngleLeft = 0;
+            total = 1;
         }
-        for (DcMotorEx rightMotor : rightMotors) {
-            rightMotor.setPower(v1);
+        if (total < -1) {
+            iAngleLeft = 0;
+            total = -1;
         }
+        return total;
+    }
+
+    //Right Pod PID
+    //private ElapsedTime runtimePodRight = new ElapsedTime();
+    double rightPodAngle = 0;
+    double pAngleRight = 0;
+    double iAngleRight = 0;
+    double dAngleRight = 0;
+
+    public double rightPodTurn(double angle) {
+        rightPodAngle = (rightMotors.get(0).getCurrentPosition() + rightMotors.get(1).getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
+        /*double secs = runtimePodRight.seconds();
+        runtimePodRight.reset();
+        dAngleRight = (error - pAngleRight) / secs;
+        iAngleRight = iAngleRight + (error * secs);*/
+        pAngleRight = error;
+        double total = (kpPod * pAngleRight + kiPod * iAngleRight + kdPod * dAngleRight) / 100;
+        if (total > 1) {
+            iAngleRight = 0;
+            total = 1;
+        }
+        if (total < -1) {
+            iAngleRight = 0;
+            total = -1;
+        }
+        return total;
     }
 
     @Override
