@@ -31,6 +31,79 @@ public class RoadRunnerAuto extends LinearOpMode {
         robot.followTrajectory(goToPole);
     }
 
+    public void resetPods(){
+        runtime.reset();
+        while(opModeIsActive()) {
+            double leftPodPower = leftPodTurn(0);
+            double rightPodPower = rightPodTurn(0);
+            robot.leftOne.setVelocity(leftPodPower * 2500);
+            robot.leftTwo.setVelocity(-leftPodPower * 2500);
+            robot.rightOne.setVelocity(rightPodPower * 2500);
+            robot.rightTwo.setVelocity(-rightPodPower * 2500);
+            if(runtime.milliseconds() > 500) break;
+        }
+        robot.leftOne.setVelocity(0);
+        robot.leftTwo.setVelocity(0);
+        robot.rightOne.setVelocity(0);
+        robot.rightTwo.setVelocity(0);
+    }
+
+    double leftPodAngle = 0;
+    double pAngleLeft = 0;
+    double iAngleLeft = 0;
+    double dAngleLeft = 0;
+
+    double kpPod = 1.2;
+    double kiPod = 0;
+    double kdPod = 0;
+
+    public double leftPodTurn(double angle) {
+        leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
+        /*double secs = runtimePodLeft.seconds();
+        runtimePodLeft.reset();
+        dAngleLeft = (error - pAngleLeft) / secs;
+        iAngleLeft = iAngleLeft + (error * secs);*/
+        pAngleLeft = error;
+        double total = (kpPod * pAngleLeft + kiPod * iAngleLeft + kdPod * dAngleLeft) / 100;
+        if (total > 1) {
+            iAngleLeft = 0;
+            total = 1;
+        }
+        if (total < -1) {
+            iAngleLeft = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    //Right Pod PID
+    //private ElapsedTime runtimePodRight = new ElapsedTime();
+    double rightPodAngle = 0;
+    double pAngleRight = 0;
+    double iAngleRight = 0;
+    double dAngleRight = 0;
+
+    public double rightPodTurn(double angle) {
+        rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
+        /*double secs = runtimePodRight.seconds();
+        runtimePodRight.reset();
+        dAngleRight = (error - pAngleRight) / secs;
+        iAngleRight = iAngleRight + (error * secs);*/
+        pAngleRight = error;
+        double total = (kpPod * pAngleRight + kiPod * iAngleRight + kdPod * dAngleRight) / 100;
+        if (total > 1) {
+            iAngleRight = 0;
+            total = 1;
+        }
+        if (total < -1) {
+            iAngleRight = 0;
+            total = -1;
+        }
+        return total;
+    }
+
     public void moveLift(int target){
         runtime.reset();
         while (opModeIsActive()){
