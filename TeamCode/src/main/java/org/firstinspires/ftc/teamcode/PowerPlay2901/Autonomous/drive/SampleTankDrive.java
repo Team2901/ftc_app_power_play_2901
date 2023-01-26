@@ -293,10 +293,11 @@ public class SampleTankDrive extends TankDrive {
     public void setMotorPowers(double v, double v1) {
         double leftTurnPower = leftPodTurn(0);
         double rightTurnPower = rightPodTurn(0);
-        leftMotors.get(0).setPower(v - leftTurnPower);
-        leftMotors.get(1).setPower(-(v + leftTurnPower));
-        rightMotors.get(0).setPower(v - rightTurnPower);
-        rightMotors.get(1).setPower(-(v + rightTurnPower));
+
+        leftMotors.get(0).setVelocity((v/3 + leftTurnPower)*2500);
+        leftMotors.get(1).setVelocity((v/3 - leftTurnPower)*2500);
+        rightMotors.get(0).setVelocity((v/3 + rightTurnPower)*2500);
+        rightMotors.get(1).setVelocity((v/3 - rightTurnPower)*2500);
     }
 
     double leftPodAngle = 0;
