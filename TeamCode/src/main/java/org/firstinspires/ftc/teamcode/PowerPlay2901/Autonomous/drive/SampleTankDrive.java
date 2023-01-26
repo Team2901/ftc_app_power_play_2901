@@ -106,10 +106,10 @@ public class SampleTankDrive extends TankDrive {
 
 
         // add/remove motors depending on your robot (e.g., 6WD)
-        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "left 1");
-        DcMotorEx leftRear = hardwareMap.get(DcMotorEx.class, "left 2");
-        DcMotorEx rightRear = hardwareMap.get(DcMotorEx.class, "right 2");
-        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "right 1");
+        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "right 1");
+        DcMotorEx leftRear = hardwareMap.get(DcMotorEx.class, "right 2");
+        DcMotorEx rightRear = hardwareMap.get(DcMotorEx.class, "left 1");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "left 2");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
         leftMotors = Arrays.asList(leftFront, leftRear);
@@ -132,8 +132,6 @@ public class SampleTankDrive extends TankDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -212,10 +210,6 @@ public class SampleTankDrive extends TankDrive {
         while (!Thread.currentThread().isInterrupted() && isBusy()) {
             update();
         }
-        leftMotors.get(0).setPower(0);
-        leftMotors.get(1).setPower(0);
-        rightMotors.get(0).setPower(0);
-        rightMotors.get(1).setPower(0);
     }
 
     public boolean isBusy() {
@@ -291,13 +285,16 @@ public class SampleTankDrive extends TankDrive {
 
     @Override
     public void setMotorPowers(double v, double v1) {
-        double leftTurnPower = leftPodTurn(0);
-        double rightTurnPower = rightPodTurn(0);
+        double turnFeedforward = 1.1;
+        v *= turnFeedforward;
+        v1 /= turnFeedforward;
+        double leftFeedforward = -.999;
+        double rightFeedforward = -.92;
 
-        leftMotors.get(0).setVelocity((v/3 + leftTurnPower)*2500);
-        leftMotors.get(1).setVelocity((v/3 - leftTurnPower)*2500);
-        rightMotors.get(0).setVelocity((v/3 + rightTurnPower)*2500);
-        rightMotors.get(1).setVelocity((v/3 - rightTurnPower)*2500);
+        leftMotors.get(0).setPower(v * leftFeedforward);
+        leftMotors.get(1).setPower(v / leftFeedforward);
+        rightMotors.get(0).setPower(v1 * rightFeedforward);
+        rightMotors.get(1).setPower(v1 / rightFeedforward);
     }
 
     double leftPodAngle = 0;
