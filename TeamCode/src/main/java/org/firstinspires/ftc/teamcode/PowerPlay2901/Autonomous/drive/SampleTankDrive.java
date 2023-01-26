@@ -285,7 +285,7 @@ public class SampleTankDrive extends TankDrive {
 
     @Override
     public void setMotorPowers(double v, double v1) {
-        double turnFeedforward = 1.1;
+        double turnFeedforward = 1;
         v *= turnFeedforward;
         v1 /= turnFeedforward;
         double leftFeedforward = -.999;
