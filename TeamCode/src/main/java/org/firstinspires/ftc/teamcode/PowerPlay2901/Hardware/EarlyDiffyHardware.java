@@ -105,6 +105,7 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
             pipeLine = new ObjectDetectionPipeline(telemetry);

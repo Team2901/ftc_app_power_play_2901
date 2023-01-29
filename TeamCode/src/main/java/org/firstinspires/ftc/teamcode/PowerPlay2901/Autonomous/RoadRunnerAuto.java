@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,24 +12,122 @@ import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.drive.SampleTankD
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
+import java.util.concurrent.TimeUnit;
+
 @Autonomous(name = "ROAD RUNNER AUTO!!!", group = "010")
 public class RoadRunnerAuto extends LinearOpMode {
-
     EarlyDiffyHardware robot = new EarlyDiffyHardware();
     ElapsedTime runtime = new ElapsedTime();
+    ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     double liftFeedForward = -.0006;
+
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot.init(hardwareMap);
         SampleTankDrive robot = new SampleTankDrive(hardwareMap);
+        Trajectory goToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(32, 4.5), Math.toRadians(45)).build();
+        Trajectory coneToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(20, -9), Math.toRadians(-60)).build();
         waitForStart();
 
-        Trajectory goForward = robot.trajectoryBuilder(new Pose2d(0, 0, 0)).forward(30).build();
-        robot.followTrajectory(goForward);
-        robot.turn(Math.PI/2);
-        //moveLift(300);
-        Trajectory goToPole = robot.trajectoryBuilder(new Pose2d(0, 0, 0)).forward(10).build();
+
+//
         robot.followTrajectory(goToPole);
+
+        for(int i = 0; i < 6; i++) {
+            move(-14);
+            resetPods();
+            turn(92);
+            resetPods();
+            slightMove(-30);
+            resetPods();
+            turn(92);
+            resetPods();
+            robot.followTrajectory(coneToPole);
+            resetPods();
+        }
+    }
+
+    public void slightMove(double inches){
+        timer.reset();
+        while(timer.milliseconds() < Math.abs((inches*38.96))){
+            if(inches > 0) {
+                this.robot.leftOne.setVelocity(-2500 / 3.0);
+                this.robot.leftTwo.setVelocity(-2500 / 3.0);
+                this.robot.rightOne.setVelocity(-2500 / 3.0);
+                this.robot.rightTwo.setVelocity(-2500 / 3.0);
+            } else if(inches < 0){
+                this.robot.leftOne.setVelocity((1-(2.7*Math.toRadians(90-robot.getAngle()))) * 2500 / 3.0);
+                this.robot.leftTwo.setVelocity((1-(2.7*Math.toRadians(90-robot.getAngle()))) * 2500 / 3.0);
+                this.robot.rightOne.setVelocity((1+(2.7*Math.toRadians(90-robot.getAngle()))) * 2500 / 3.0);
+                this.robot.rightTwo.setVelocity((1+(2.7*Math.toRadians(90-robot.getAngle()))) * 2500 / 3.0);
+            }
+        }
+        this.robot.leftOne.setVelocity(0);
+        this.robot.leftTwo.setVelocity(0);
+        this.robot.rightOne.setVelocity(0);
+        this.robot.rightTwo.setVelocity(0);
+    }
+    public void move(double inches){
+        timer.reset();
+        while(timer.milliseconds() < Math.abs((inches*38.96))){
+            if(inches > 0) {
+                this.robot.leftOne.setVelocity(-2500 / 3.0);
+                this.robot.leftTwo.setVelocity(-2500 / 3.0);
+                this.robot.rightOne.setVelocity(-2500 / 3.0);
+                this.robot.rightTwo.setVelocity(-2500 / 3.0);
+            } else if(inches < 0){
+                this.robot.leftOne.setVelocity(2500 / 3.0);
+                this.robot.leftTwo.setVelocity(2500 / 3.0);
+                this.robot.rightOne.setVelocity(2500 / 3.0);
+                this.robot.rightTwo.setVelocity(2500 / 3.0);
+            }
+        }
+        this.robot.leftOne.setVelocity(0);
+        this.robot.leftTwo.setVelocity(0);
+        this.robot.rightOne.setVelocity(0);
+        this.robot.rightTwo.setVelocity(0);
+    }
+    public void turn(double angle){
+        timer.reset();
+        while(Math.abs(AngleUnit.normalizeDegrees(angle - robot.getAngle())) > 1 && timer.milliseconds() < 1750){
+            double turnPower = turnPID(angle - robot.getAngle());
+            double outputRight = turnPower;
+            double outputLeft = -turnPower;
+            robot.leftOne.setVelocity((outputLeft/3)*2500);
+            robot.leftTwo.setVelocity((outputLeft/3)*2500);
+            robot.rightOne.setVelocity((outputRight/3)*2500);
+            robot.rightTwo.setVelocity((outputRight/3)*2500);
+        }
+        robot.leftOne.setVelocity(0);
+        robot.leftTwo.setVelocity(0);
+        robot.rightOne.setVelocity(0);
+        robot.rightTwo.setVelocity(0);
+    }
+
+    private ElapsedTime runtimeTurn = new ElapsedTime();
+    double pTurn = 0;
+    double iTurn = 0;
+    double dTurn = 0;
+    double ktp = 1.30;
+    double kti = 0.00;
+    double ktd = 0.3;
+
+    public double turnPID(double error){
+        double secs = runtimeTurn.seconds();
+        runtimeTurn.reset();
+        dTurn = (error - pTurn) / secs;
+        iTurn = iTurn + (error * secs);
+        pTurn = error;
+        double total = (ktp* pTurn + kti* iTurn + ktd*dTurn)/100;
+        if(total > 1){
+            iTurn = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iTurn = 0;
+            total = -1;
+        }
+        return total;
     }
 
     public void resetPods(){
@@ -150,6 +249,48 @@ public class RoadRunnerAuto extends LinearOpMode {
             total = -1;
         }
         return total;
+    }
+
+    public static final double encoderTicksPerWheelRev = 8192; //REV encoders
+    public static final double wheelCircumference = (2.83465 * Math.PI); //72mm diameter wheels
+    public static final double leftRightDistance = 8.375; //Distance between left and right odometry wheels
+    public static final double midpointBackDistance = 7.25;
+    public static final double inchPerTick = wheelCircumference / encoderTicksPerWheelRev;
+    public static final double wheelCircumferenceBack = (2 * Math.PI);
+    public static final double backInchPerTick = wheelCircumferenceBack / encoderTicksPerWheelRev;
+    public int currentLeftPosition = 0;
+    public int currentRightPosition = 0;
+    public int currentBackPosition = 0;
+    private int oldLeftPosition = 0;
+    private int oldRightPosition = 0;
+    private int oldBackPosition = 0;
+    double cameraXOffset = 6; //lies 6 inches in front of middle
+    double cameraYOffset = -3.5;
+    public XYhVector START_POS = new XYhVector(-cameraXOffset, -cameraYOffset, 0);
+    public XYhVector pos = new XYhVector(START_POS);
+    public void odometry() {
+        oldRightPosition = currentRightPosition;
+        oldLeftPosition = currentLeftPosition;
+        oldBackPosition = currentBackPosition;
+
+        currentRightPosition = robot.odoRight.getCurrentPosition();
+        currentLeftPosition = robot.odoLeft.getCurrentPosition();
+        currentBackPosition = robot.liftTwo.getCurrentPosition();
+
+        int dn1 = currentRightPosition - oldRightPosition;
+        int dn2 = currentLeftPosition - oldLeftPosition;
+        int dn3 = currentBackPosition - oldBackPosition;
+
+        dn2 = -dn2;
+
+        double dtheta = ((dn2 - dn1) / leftRightDistance) * inchPerTick;
+        double dx = ((dn1 + dn2) / 2) * inchPerTick;
+        double dy = ((backInchPerTick * dn3) - (inchPerTick * (dn2 - dn1) * midpointBackDistance) / leftRightDistance);
+
+        double theta = pos.h + (dtheta / 2.0);
+        pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.h += dtheta;
     }
 
 }

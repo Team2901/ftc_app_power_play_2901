@@ -63,6 +63,8 @@ public class SampleTankDrive extends TankDrive {
     public static double VX_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
+    public double turnFeedforward = 0.93;
+
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
@@ -74,6 +76,12 @@ public class SampleTankDrive extends TankDrive {
     private BNO055IMU imu;
 
     private VoltageSensor batteryVoltageSensor;
+
+    public DcMotorEx leftFront;
+    public DcMotorEx leftRear;
+    public DcMotorEx rightRear;
+    public DcMotorEx rightFront;
+
 
     public SampleTankDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH);
@@ -106,10 +114,10 @@ public class SampleTankDrive extends TankDrive {
 
 
         // add/remove motors depending on your robot (e.g., 6WD)
-        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "right 1");
-        DcMotorEx leftRear = hardwareMap.get(DcMotorEx.class, "right 2");
-        DcMotorEx rightRear = hardwareMap.get(DcMotorEx.class, "left 1");
-        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "left 2");
+        leftFront = hardwareMap.get(DcMotorEx.class, "right 1");
+        leftRear = hardwareMap.get(DcMotorEx.class, "right 2");
+        rightRear = hardwareMap.get(DcMotorEx.class, "left 1");
+        rightFront = hardwareMap.get(DcMotorEx.class, "left 2");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
         leftMotors = Arrays.asList(leftFront, leftRear);
@@ -285,16 +293,16 @@ public class SampleTankDrive extends TankDrive {
 
     @Override
     public void setMotorPowers(double v, double v1) {
-        double turnFeedforward = 1;
+
         v *= turnFeedforward;
         v1 /= turnFeedforward;
         double leftFeedforward = -.999;
         double rightFeedforward = -.92;
 
-        leftMotors.get(0).setPower(v * leftFeedforward);
-        leftMotors.get(1).setPower(v / leftFeedforward);
-        rightMotors.get(0).setPower(v1 * rightFeedforward);
-        rightMotors.get(1).setPower(v1 / rightFeedforward);
+        leftMotors.get(0).setPower(v * leftFeedforward + leftPodTurn(0));
+        leftMotors.get(1).setPower(v / leftFeedforward - leftPodTurn(0));
+        rightMotors.get(0).setPower(v1 * rightFeedforward + rightPodTurn(0));
+        rightMotors.get(1).setPower(v1 / rightFeedforward - rightPodTurn(0));
     }
 
     @Override
@@ -316,5 +324,60 @@ public class SampleTankDrive extends TankDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+    double leftPodAngle = 0;
+    double pAngleLeft = 0;
+    double iAngleLeft = 0;
+    double dAngleLeft = 0;
+
+    double kpPod = 1.2;
+    double kiPod = 0;
+    double kdPod = 0;
+
+    public double leftPodTurn(double angle) {
+        leftPodAngle = (leftMotors.get(0).getCurrentPosition() - leftMotors.get(1).getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
+        /*double secs = runtimePodLeft.seconds();
+        runtimePodLeft.reset();
+        dAngleLeft = (error - pAngleLeft) / secs;
+        iAngleLeft = iAngleLeft + (error * secs);*/
+        pAngleLeft = error;
+        double total = (kpPod * pAngleLeft + kiPod * iAngleLeft + kdPod * dAngleLeft) / 100;
+        if (total > 1) {
+            iAngleLeft = 0;
+            total = 1;
+        }
+        if (total < -1) {
+            iAngleLeft = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    //Right Pod PID
+    //private ElapsedTime runtimePodRight = new ElapsedTime();
+    double rightPodAngle = 0;
+    double pAngleRight = 0;
+    double iAngleRight = 0;
+    double dAngleRight = 0;
+
+    public double rightPodTurn(double angle) {
+        rightPodAngle = (rightMotors.get(0).getCurrentPosition() - rightMotors.get(1).getCurrentPosition()) / 8.95;
+        double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
+        /*double secs = runtimePodRight.seconds();
+        runtimePodRight.reset();
+        dAngleRight = (error - pAngleRight) / secs;
+        iAngleRight = iAngleRight + (error * secs);*/
+        pAngleRight = error;
+        double total = (kpPod * pAngleRight + kiPod * iAngleRight + kdPod * dAngleRight) / 100;
+        if (total > 1) {
+            iAngleRight = 0;
+            total = 1;
+        }
+        if (total < -1) {
+            iAngleRight = 0;
+            total = -1;
+        }
+        return total;
     }
 }

@@ -12,7 +12,7 @@ public class TestAuto extends LinearOpMode {
         robot = new Robot(this, true);
         robot.initIMU();
 
-        robot.driveController.drive(Vector2d.FORWARD, 100, 1, this);
+        robot.driveController.drive(Vector2d.FORWARD, 100, 0.5, this);
         //simple sequence to demonstrate the three main autonomous primitives
 //
 //        //rotate modules to face to the right

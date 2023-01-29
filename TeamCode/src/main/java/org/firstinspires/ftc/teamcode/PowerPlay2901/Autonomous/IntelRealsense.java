@@ -201,8 +201,8 @@
 //        double adjustX = ((offsetX * Math.cos(angleOffset)) - (offsetY * Math.sin(angleOffset)));
 //        double adjustY = ((offsetX * Math.sin(angleOffset)) + (offsetY * Math.cos(angleOffset)));
 //
-//        averagedX = (offsetX + pos.x)/2;
-//        averagedY = (offsetY + pos.y)/2;
+//        averagedX = ((offsetX*1) + (pos.x*0));
+//        averagedY = ((offsetY*1) + (pos.y*0));
 //
 //        //Changes target Position
 //        if (improvedGamepad.dpad_right.isInitialPress()) {
@@ -227,21 +227,21 @@
 //
 //
 //
-//        if(firstRound){
-//            move(0, 48);
-//            firstRound = false;
-//            telemetry.addLine("First Round");
-//        }else if(autoState == AutoState.MOVE_FORWARD){
-//            if(!isTurning && !isMoving) {
-//                autoState = AutoState.TURN_45;
-//                move(24, 0);
-//            }
-//        }else if(autoState == AutoState.TURN_45){
-//            if(!isTurning && !isMoving) {
-//                autoState = AutoState.LIFT_SLIDES;
-//                move(-24, 0);
-//            }
-//        }
+////        if(firstRound){
+////            move(0, 48);
+////            firstRound = false;
+////            telemetry.addLine("First Round");
+////        }else if(autoState == AutoState.MOVE_FORWARD){
+////            if(!isTurning && !isMoving) {
+////                autoState = AutoState.TURN_45;
+////                move(24, 0);
+////            }
+////        }else if(autoState == AutoState.TURN_45){
+////            if(!isTurning && !isMoving) {
+////                autoState = AutoState.LIFT_SLIDES;
+////                move(-24, 0);
+////            }
+////        }
 //
 //        /*//Auto States cycle
 //        switch(autoState){
@@ -379,33 +379,34 @@
 //        odometry();
 //
 //        //Movement PID code
-//        if (!isTurning && isMoving && (Math.abs(((positionX) - (pos.x))) > 0 || Math.abs((positionY) - (pos.y)) > 0)) {
+//        if (!isTurning && isMoving && (Math.abs(((positionX) - (averagedX))) > 0 || Math.abs((positionY) - (averagedY)) > 0)) {
 //
-//            double dx = ((positionX) - (pos.x));
-//            double dy = ((positionY) - (pos.y));
+//            double dx = ((positionX) - (averagedX));
+//            double dy = ((positionY) - (averagedY));
 //            double angle = Math.atan(dy / dx);
 //            currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
-//            angleToTarget = -Math.toDegrees(angle);
+////            angleToTarget = -Math.toDegrees(angle);
+//            angleToTarget = -Math.toDegrees(Math.atan2(-dx, dy));
 //
 //            //Adjusts angle for pods
-//            if (dy > 0) {
-//                angleToTarget += 180;
-//            } else if (dx < 0 && dy < 0) {
-//                angleToTarget += 360;
-//            }
-//            if (dx > 0 && dy < 0) {
-//                angleToTarget -= 180;
-//            }
-//            if (dx < 0 && dy > 0) {
-//                angleToTarget += 180;
-//            }
-//            if (angleToTarget > 180) {
-//                angleToTarget -= 360;
-//            }
-//
-//            //If pods are moving perpendicular change this value by +90 or -90
-//            //If pods are moving opposite direction change this value by +180/-180
-//            angleToTarget -= 90;
+////            if (dy > 0) {
+////                angleToTarget += 180;
+////            } else if (dx < 0 && dy < 0) {
+////                angleToTarget += 360;
+////            }
+////            if (dx > 0 && dy < 0) {
+////                angleToTarget -= 180;
+////            }
+////            if (dx < 0 && dy > 0) {
+////                angleToTarget += 180;
+////            }
+////            if (angleToTarget > 180) {
+////                angleToTarget -= 360;
+////            }
+////
+////            //If pods are moving perpendicular change this value by +90 or -90
+////            //If pods are moving opposite direction change this value by +180/-180
+////            angleToTarget -= 90;
 //
 //            currentTime = time.time(TimeUnit.MILLISECONDS);
 //
@@ -445,7 +446,7 @@
 //        telemetry.addData("position x", positionX);
 //
 //        //Creates dead zone radius larger than target
-//        if (isMoving && (Math.abs(((positionX) - (pos.x))) < 0.5 && Math.abs((positionY) - (pos.y)) < 0.5)) {
+//        if (isMoving && (Math.abs(((positionX) - (averagedX))) < 0.5 && Math.abs((positionY) - (averagedY)) < 0.5)) {
 //            outputLeft = 0;
 //            outputRight = 0;
 //            leftTurnPower = 0;
@@ -539,8 +540,8 @@
 //
 //    //enter (x, y) coordinates to move robot by
 //    public void move(double x, double y) {
-//        positionX = x + (pos.x);
-//        positionY = y + (pos.y);
+//        positionX = x + (averagedX);
+//        positionY = y + (averagedY);
 //        isMoving = true;
 //    }
 //
