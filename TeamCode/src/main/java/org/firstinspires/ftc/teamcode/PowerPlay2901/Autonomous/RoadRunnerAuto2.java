@@ -15,24 +15,49 @@ import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 public class RoadRunnerAuto2 extends LinearOpMode {
     EarlyDiffyHardware robot = new EarlyDiffyHardware();
     ElapsedTime runtime = new ElapsedTime();
+    ElapsedTime matchTimer = new ElapsedTime();
     ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     double liftFeedForward = -.0006;
+    int parking = -1;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        this.robot.init(hardwareMap);
+        this.robot.init(hardwareMap, telemetry, true);
         SampleTankDrive robot = new SampleTankDrive(hardwareMap);
         Trajectory goToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(32, 4.5), Math.toRadians(45)).build();
         Trajectory coneToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(20, -9), Math.toRadians(-60)).build();
         Trajectory poleToCone = robot.trajectoryBuilder(new Pose2d(), true).splineTo(new Vector2d(-13, -13), Math.toRadians(70)).build();
         waitForStart();
+        matchTimer.reset();
 
+        while(true){
+            if(this.robot.pipeLine.winner != -1){
+                parking = this.robot.pipeLine.winner;
+                break;
+            }
+        }
         robot.followTrajectory(goToPole);
+        resetPods();
         for(int i = 0; i < 6; i++) {
             robot.followTrajectory(poleToCone);
             resetPods();
             robot.followTrajectory(coneToPole);
             resetPods();
+            if(matchTimer.seconds() > 24){
+                robot.followTrajectory(poleToCone);
+                resetPods();
+                park();
+                break;
+            }
+        }
+    }
+
+    public void park(){
+        if(parking == 1){
+            move(48);
+        }else if(parking == 2){
+            move(24);
+        }else if(parking == 0){
         }
     }
 
