@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.drive.SampleTankDrive;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 
 @Autonomous(name = "ROAD RUNNER AUTO 2!!!", group = "010")
@@ -17,23 +19,66 @@ public class RoadRunnerAuto2 extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     double liftFeedForward = -.0006;
+    int liftTarget = 50;
 
     @Override
     public void runOpMode() throws InterruptedException {
         this.robot.init(hardwareMap);
         SampleTankDrive robot = new SampleTankDrive(hardwareMap);
+        robot.liftTarget = liftTarget;
+        Pose2d startPose = new Pose2d();
+        TrajectorySequence goToPoleConePole = robot.trajectorySequenceBuilder(startPose)
+                .addTemporalMarker(.05, .1, () -> {
+                    robot.liftTarget = 500;
+                })
+                .splineTo(new Vector2d(33.75, 4.75), Math.toRadians(52.5))
+                .waitSeconds(1)
+                //1+0
+                .setReversed(true)
+                .splineTo(new Vector2d(31, 0), Math.toRadians(-85))
+                .addTemporalMarker(.5, .1, () -> {
+                    robot.liftTarget = 500;
+                })
+                .splineTo(new Vector2d( 30.5, -20), Math.toRadians(-85))
+                .waitSeconds(2)
+                //.setReversed(false)
+                //.splineTo(new Vector2d(20, -11), Math.toRadians(-60))
+                //1+1
+                /*
+                .setReversed(true)
+                .splineTo(new Vector2d(-13, -13), Math.toRadians(69))
+                .setReversed(false)
+                .splineTo(new Vector2d(20, -11), Math.toRadians(-60))
+                //1+2
+                .setReversed(true)
+                .splineTo(new Vector2d(-13, -13), Math.toRadians(69))
+                .setReversed(false)
+                .splineTo(new Vector2d(20, -11), Math.toRadians(-60))
+                //1+3
+                .setReversed(true)
+                .splineTo(new Vector2d(-13, -13), Math.toRadians(69))
+                .setReversed(false)
+                .splineTo(new Vector2d(20, -11), Math.toRadians(-60))
+                //1+4
+                .setReversed(true)
+                .splineTo(new Vector2d(-13, -13), Math.toRadians(69))
+                .setReversed(false)
+                .splineTo(new Vector2d(20, -11), Math.toRadians(-60))
+                //1+5
+                */
+                .build();
         Trajectory goToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(32, 4.5), Math.toRadians(45)).build();
-        Trajectory coneToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(20, -9), Math.toRadians(-60)).build();
-        Trajectory poleToCone = robot.trajectoryBuilder(new Pose2d(), true).splineTo(new Vector2d(-13, -13), Math.toRadians(70)).build();
+        Trajectory coneToPole = robot.trajectoryBuilder(new Pose2d()).splineTo(new Vector2d(20, -11), Math.toRadians(-60)).build();
+        Trajectory poleToCone = robot.trajectoryBuilder(new Pose2d(), true).splineTo(new Vector2d(-13, -13), Math.toRadians(69)).build();
         waitForStart();
 
-        robot.followTrajectory(goToPole);
-        for(int i = 0; i < 6; i++) {
+        robot.followTrajectorySequence(goToPoleConePole);
+        /*for(int i = 0; i < 1; i++) {
             robot.followTrajectory(poleToCone);
             resetPods();
             robot.followTrajectory(coneToPole);
             resetPods();
-        }
+        }*/
     }
 
     public void slightMove(double inches){
@@ -122,6 +167,9 @@ public class RoadRunnerAuto2 extends LinearOpMode {
     public void resetPods(){
         runtime.reset();
         while(opModeIsActive()) {
+            double liftPower = liftPower(liftTarget);
+            robot.liftOne.setPower(liftPower);
+            robot.liftTwo.setPower(liftPower);
             double leftPodPower = leftPodTurn(0);
             double rightPodPower = rightPodTurn(0);
             robot.leftOne.setVelocity(leftPodPower * 2500);

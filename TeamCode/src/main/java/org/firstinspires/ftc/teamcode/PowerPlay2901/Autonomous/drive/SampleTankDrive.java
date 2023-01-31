@@ -27,6 +27,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -81,7 +82,10 @@ public class SampleTankDrive extends TankDrive {
     public DcMotorEx leftRear;
     public DcMotorEx rightRear;
     public DcMotorEx rightFront;
+    public DcMotor liftOne;
+    public DcMotor liftTwo;
 
+    public int liftTarget = 0;
 
     public SampleTankDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH);
@@ -146,6 +150,9 @@ public class SampleTankDrive extends TankDrive {
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+
+        liftOne = hardwareMap.get(DcMotor.class, "lift 1");
+        liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -211,7 +218,38 @@ public class SampleTankDrive extends TankDrive {
     public void update() {
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        double liftPower = liftPower(liftTarget);
+        liftOne.setPower(liftPower);
+        liftTwo.setPower(liftPower);
         if (signal != null) setDriveSignal(signal);
+    }
+
+    double klp = 0.7;
+    double kli = 0.0005;
+    double kld = 0.015;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftPower(int target){
+        int error = liftOne.getCurrentPosition() - target;
+        double secs = runtimeLift.seconds();
+        runtimeLift.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > .65){
+            liftI = 0;
+            total = .65;
+        }
+        if(total < -1){
+            liftI = 0;
+            total = -1;
+        }
+        return total;
     }
 
     public void waitForIdle() {
