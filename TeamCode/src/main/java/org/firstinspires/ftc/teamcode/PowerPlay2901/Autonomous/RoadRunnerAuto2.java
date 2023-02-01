@@ -31,15 +31,18 @@ public class RoadRunnerAuto2 extends LinearOpMode {
                 .addTemporalMarker(.05, .1, () -> {
                     robot.liftTarget = 500;
                 })
-                .splineTo(new Vector2d(33.75, 4.75), Math.toRadians(52.5))
+                .splineTo(new Vector2d(32.75, 4.3), Math.toRadians(52.5))
+                .addTemporalMarker(.25, .1, () -> {
+                    robot.liftTarget = 500;
+                })
                 .waitSeconds(1)
                 //1+0
                 .setReversed(true)
-                .splineTo(new Vector2d(31, 0), Math.toRadians(-85))
+                .splineTo(new Vector2d(28, 0), Math.toRadians(-85))
                 .addTemporalMarker(.5, .1, () -> {
                     robot.liftTarget = 500;
                 })
-                .splineTo(new Vector2d( 30.5, -20), Math.toRadians(-85))
+                .splineTo(new Vector2d(26.5, -20), Math.toRadians(-85))
                 .waitSeconds(2)
                 //.setReversed(false)
                 //.splineTo(new Vector2d(20, -11), Math.toRadians(-60))
