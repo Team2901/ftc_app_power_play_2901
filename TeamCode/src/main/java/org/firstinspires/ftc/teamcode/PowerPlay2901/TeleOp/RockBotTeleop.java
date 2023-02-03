@@ -55,9 +55,9 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.left_trigger > 0.5){
-            robot.claw.setPosition(.38);
+            robot.claw.setPosition(.915);
         } else {
-            robot.claw.setPosition(.288);
+            robot.claw.setPosition(.85);
         }
 
         if(gamepad2.y){
