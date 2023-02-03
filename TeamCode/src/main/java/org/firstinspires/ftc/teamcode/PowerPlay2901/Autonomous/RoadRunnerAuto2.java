@@ -21,9 +21,11 @@ public class RoadRunnerAuto2 extends LinearOpMode {
     double liftFeedForward = -.0006;
     int liftTarget = 50;
 
+    int parking = -1;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        this.robot.init(hardwareMap);
+        this.robot.init(hardwareMap, telemetry, true);
         SampleTankDrive robot = new SampleTankDrive(hardwareMap);
         robot.liftTarget = liftTarget;
         Pose2d startPose = new Pose2d();
@@ -31,7 +33,7 @@ public class RoadRunnerAuto2 extends LinearOpMode {
                 .addTemporalMarker(.05, .1, () -> {
                     robot.liftTarget = 500;
                 })
-                .splineTo(new Vector2d(32.75, 4.3), Math.toRadians(52.5))
+                .splineTo(new Vector2d(34.75, 4.3), Math.toRadians(52.5))
                 .addTemporalMarker(.25, .1, () -> {
                     robot.liftTarget = 500;
                 })
@@ -42,7 +44,7 @@ public class RoadRunnerAuto2 extends LinearOpMode {
                 .addTemporalMarker(.5, .1, () -> {
                     robot.liftTarget = 500;
                 })
-                .splineTo(new Vector2d(26.5, -20), Math.toRadians(-85))
+                .splineTo(new Vector2d(27.5, -20), Math.toRadians(-85))
                 .waitSeconds(2)
                 //.setReversed(false)
                 //.splineTo(new Vector2d(20, -11), Math.toRadians(-60))
@@ -75,13 +77,36 @@ public class RoadRunnerAuto2 extends LinearOpMode {
         Trajectory poleToCone = robot.trajectoryBuilder(new Pose2d(), true).splineTo(new Vector2d(-13, -13), Math.toRadians(69)).build();
         waitForStart();
 
-        robot.followTrajectorySequence(goToPoleConePole);
+        while(true){
+            if(this.robot.pipeLine.winner != -1){
+                parking = this.robot.pipeLine.winner;
+                break;
+            }
+        }
+
+        //robot.followTrajectorySequence(goToPoleConePole);
+        robot.liftPower(500);
+        while(opModeIsActive()){
+            telemetry.addData("loop time", robot.secs);
+            telemetry.update();
+        }
+        park();
         /*for(int i = 0; i < 1; i++) {
             robot.followTrajectory(poleToCone);
             resetPods();
             robot.followTrajectory(coneToPole);
             resetPods();
         }*/
+    }
+    public void park(){
+        resetPods();
+        turn(92);
+        if(parking == 1){
+            move(48);
+        }else if(parking == 2){
+            move(24);
+        }else if (parking == 0){
+        }
     }
 
     public void slightMove(double inches){
@@ -170,9 +195,9 @@ public class RoadRunnerAuto2 extends LinearOpMode {
     public void resetPods(){
         runtime.reset();
         while(opModeIsActive()) {
-            double liftPower = liftPower(liftTarget);
-            robot.liftOne.setPower(liftPower);
-            robot.liftTwo.setPower(liftPower);
+            //double liftPower = liftPower(liftTarget);
+            //robot.liftOne.setPower(liftPower);
+            //robot.liftTwo.setPower(liftPower);
             double leftPodPower = leftPodTurn(0);
             double rightPodPower = rightPodTurn(0);
             robot.leftOne.setVelocity(leftPodPower * 2500);
@@ -250,16 +275,16 @@ public class RoadRunnerAuto2 extends LinearOpMode {
             telemetry.addData("target", target);
             double liftPower = liftPower(target);
             telemetry.addData("lift power", liftPower);
-            robot.liftOne.setPower(liftPower + liftFeedForward);
-            robot.liftTwo.setPower(liftPower + liftFeedForward);
+//            robot.liftOne.setPower(liftPower + liftFeedForward);
+//            robot.liftTwo.setPower(liftPower + liftFeedForward);
             telemetry.addData("time elapsed", runtime.seconds());
             telemetry.update();
             if((Math.abs(robot.liftOne.getCurrentPosition() - target) < 1 && Math.abs(liftD) < 10) || runtime.seconds() > 3){
                 break;
             }
         }
-        robot.liftOne.setPower(liftFeedForward);
-        robot.liftTwo.setPower(liftFeedForward);
+//        robot.liftOne.setPower(liftFeedForward);
+//        robot.liftTwo.setPower(liftFeedForward);
     }
 
     double klp = 0.7;
@@ -275,6 +300,7 @@ public class RoadRunnerAuto2 extends LinearOpMode {
         int error = robot.liftOne.getCurrentPosition() - target;
         telemetry.addData("error", error);
         double secs = runtimeLift.seconds();
+        telemetry.addData("loop time", secs);
         runtimeLift.reset();
         liftD = (error - liftP) / secs;
         liftI = liftI + (error * secs);

@@ -21,7 +21,7 @@ public class DriveModule {
     // a WHEEL rev is when the wheel drives a distance equal to its circumference
 
     //TODO: modify this variable to match drive gear ratio
-    public final double TICKS_PER_MODULE_REV = 537.7/2.0833; //ticks per MODULE revolution
+    public final double TICKS_PER_MODULE_REV = 537.7*2/2.0833; //ticks per MODULE revolution
     public final double DEGREES_PER_TICK = 360/TICKS_PER_MODULE_REV;
 
     //TODO: modify this variable to match drive gear ratio
@@ -63,19 +63,19 @@ public class DriveModule {
         if (moduleSide == ModuleSide.RIGHT) {
             motor1 = robot.hardwareMap.dcMotor.get("right 1");
             motor2 = robot.hardwareMap.dcMotor.get("right 2");
-            positionVector = new Vector2d((double)18/2, 0); //points from robot center to right module
+            positionVector = new Vector2d((double)7.25/2, 0); //points from robot center to right module
         } else {
             motor1 = robot.hardwareMap.dcMotor.get("left 1");
             motor2 = robot.hardwareMap.dcMotor.get("left 2");
-            positionVector = new Vector2d((double)-18/2, 0); //points from robot center to left module
+            positionVector = new Vector2d((double)-7.25/2, 0); //points from robot center to left module
         }
 
         lastMotor1Encoder = motor1.getCurrentPosition();
         lastMotor2Encoder = motor2.getCurrentPosition();
 
         //set run mode to NOT use encoders for velocity PID regulation
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

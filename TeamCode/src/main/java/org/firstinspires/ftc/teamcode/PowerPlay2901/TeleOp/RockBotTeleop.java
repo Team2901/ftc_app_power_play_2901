@@ -106,8 +106,8 @@ public class RockBotTeleop extends OpMode {
         }
         double scaleFactor = 12/result;
 
-        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+//        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+//        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -199,7 +199,8 @@ public class RockBotTeleop extends OpMode {
         int error = robot.liftOne.getCurrentPosition() - target;
         telemetry.addData("error", error);
         double secs = runtimeLift.seconds();
-        runtime.reset();
+        telemetry.addData("loop time", secs);
+        runtimeLift.reset();
         liftD = (error - liftP) / secs;
         liftI = liftI + (error * secs);
         liftP = error;

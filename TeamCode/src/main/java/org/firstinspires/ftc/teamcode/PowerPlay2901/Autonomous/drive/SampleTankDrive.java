@@ -29,6 +29,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -40,6 +41,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.util.LynxModuleUt
 import java.util.Arrays;
 import java.util.List;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.drive.DriveConstants.MAX_ANG_VEL;
@@ -219,8 +221,8 @@ public class SampleTankDrive extends TankDrive {
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         double liftPower = liftPower(liftTarget);
-        liftOne.setPower(liftPower);
-        liftTwo.setPower(liftPower);
+//        liftOne.setPower(liftPower);
+//        liftTwo.setPower(liftPower);
         if (signal != null) setDriveSignal(signal);
     }
 
@@ -232,10 +234,11 @@ public class SampleTankDrive extends TankDrive {
     double liftP = 0;
     double liftI = 0;
     double liftD = 0;
+    public double secs;
 
     public double liftPower(int target){
         int error = liftOne.getCurrentPosition() - target;
-        double secs = runtimeLift.seconds();
+        secs = runtimeLift.seconds();
         runtimeLift.reset();
         liftD = (error - liftP) / secs;
         liftI = liftI + (error * secs);

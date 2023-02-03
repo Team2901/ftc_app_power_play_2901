@@ -56,7 +56,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         int x = blurImage.width()/2;
         int y = blurImage.height()/2;
 
-        Rect cropRect = new Rect(x + 20, y + 10, 70, 100);
+        Rect cropRect = new Rect(x + 30, y + 10, 70, 100);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -104,13 +104,13 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         }
         //to make sure that there are actually 2 circles but accommodating to the toggle
         if(framesProcessed > 45) {
-            if (count2 >= 40 && count1 < 20) {
+            if (count2 >= 30 && count1 < 45) {
                 winner = 2;
                 auto.parking = 2;
                 telemetry.addData("2 circles", true);
             }
             //if the amount of times that there is one is over 15 and it is greater than seeing 2 circles
-            if (count1 > 20 && winner != 2) {
+            if (count1 > 40 && winner != 2) {
                 winner = 1;
                 auto.parking = 1;
                 telemetry.addData("1 circle", true);
