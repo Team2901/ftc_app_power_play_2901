@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.IntelRealsense2;
+//import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.IntelRealsense2;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -10,7 +10,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class ObjectDetectionPipeline extends OpenCvPipeline {
-    IntelRealsense2 auto = new IntelRealsense2();
+//    IntelRealsense2 auto = new IntelRealsense2();
     Mat lastImage = null;
     private Telemetry telemetry;
     public int winner = -1;
@@ -56,7 +56,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         int x = blurImage.width()/2;
         int y = blurImage.height()/2;
 
-        Rect cropRect = new Rect(x + 30, y + 10, 70, 100);
+        Rect cropRect = new Rect(x + 60, y + 50, 210, 240);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -64,7 +64,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat circleImage = new Mat();
         //detecting hough circles
         //decreasing param2 will have it detect more circles (possibly even too many)
-        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 2, 100, 40, 5, 80);
+        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 2, 100, 45, 5, 80);
 
         for (int i = 0; i < circleImage.cols(); i++) {
             double[] data = circleImage.get(0, i);
@@ -106,19 +106,19 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         if(framesProcessed > 45) {
             if (count2 >= 30 && count1 < 45) {
                 winner = 2;
-                auto.parking = 2;
+//                auto.parking = 2;
                 telemetry.addData("2 circles", true);
             }
             //if the amount of times that there is one is over 15 and it is greater than seeing 2 circles
             if (count1 > 40 && winner != 2) {
                 winner = 1;
-                auto.parking = 1;
+//                auto.parking = 1;
                 telemetry.addData("1 circle", true);
             }
             //only if 0 circles is greater than the amount of times that it sees 1 and 2 circles
             if (count0 > count1 && count0 > count2 && count0>20 && winner != 2 && winner!= 1) {
                 winner = 0;
-                auto.parking = 0;
+//                auto.parking = 0;
                 telemetry.addData("0 circles", true);
             }
         }
