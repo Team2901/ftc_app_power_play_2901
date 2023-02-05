@@ -53,10 +53,12 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat blurImage = grayImage;
         //Imgproc.medianBlur(grayImage, blurImage, 5);
 
+        telemetry.addData("width", blurImage.width());
+        telemetry.addData("height", blurImage.height());
         int x = blurImage.width()/2;
         int y = blurImage.height()/2;
 
-        Rect cropRect = new Rect(x + 60, y + 50, 210, 240);
+        Rect cropRect = new Rect(x + 30, y + 20, 70, 90);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -64,30 +66,30 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat circleImage = new Mat();
         //detecting hough circles
         //decreasing param2 will have it detect more circles (possibly even too many)
-        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 2, 100, 45, 5, 80);
+        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 4, 100, 35, 5, 25);
 
         for (int i = 0; i < circleImage.cols(); i++) {
             double[] data = circleImage.get(0, i);
             //drawing circle that has been found
             Point center = new Point(Math.round(data[0]), Math.round(data[1]));
             // circle center
-            Imgproc.circle(cropImg, center, 1, new Scalar(255, 255, 255), 3, 8, 0);
+            Imgproc.circle(cropImg, center, 1, new Scalar(255, 255, 255), 2, 8, 0);
             // circle outline
             int radius = (int) Math.round(data[2]);
-            telemetry.addData("Radius: ", radius);
-            Imgproc.circle(cropImg, center, radius, new Scalar(255, 255, 255), 3, 8, 0);
+//            telemetry.addData("Radius: ", radius);
+            Imgproc.circle(cropImg, center, radius, new Scalar(255, 255, 255), 2, 8, 0);
         }
         if (framesProcessed < 400) {
             if (circleImage.cols() == 1) {
-                telemetry.addData("1 circle", true);
+//                telemetry.addData("1 circle", true);
                 count1++;
             }
         if (circleImage.cols() == 2) {
-            telemetry.addData("2 circles", true);
+//            telemetry.addData("2 circles", true);
             count2++;
         }
         if (circleImage.cols() == 0) {
-            telemetry.addData("0 circles", true);
+//            telemetry.addData("0 circles", true);
             count0++;
 
         }
@@ -104,22 +106,22 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         }
         //to make sure that there are actually 2 circles but accommodating to the toggle
         if(framesProcessed > 45) {
-            if (count2 >= 30 && count1 < 45) {
+            if (count2 > 30 && count2 > count1 && count1 < 45) {
                 winner = 2;
 //                auto.parking = 2;
-                telemetry.addData("2 circles", true);
+//                telemetry.addData("2 circles", true);
             }
             //if the amount of times that there is one is over 15 and it is greater than seeing 2 circles
             if (count1 > 40 && winner != 2) {
                 winner = 1;
 //                auto.parking = 1;
-                telemetry.addData("1 circle", true);
+//                telemetry.addData("1 circle", true);
             }
             //only if 0 circles is greater than the amount of times that it sees 1 and 2 circles
             if (count0 > count1 && count0 > count2 && count0>20 && winner != 2 && winner!= 1) {
                 winner = 0;
 //                auto.parking = 0;
-                telemetry.addData("0 circles", true);
+//                telemetry.addData("0 circles", true);
             }
         }
         telemetry.addData("Winner is ", winner);
