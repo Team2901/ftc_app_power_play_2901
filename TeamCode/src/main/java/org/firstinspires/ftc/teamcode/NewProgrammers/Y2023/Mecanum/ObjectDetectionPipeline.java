@@ -66,7 +66,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat circleImage = new Mat();
         //detecting hough circles
         //decreasing param2 will have it detect more circles (possibly even too many)
-        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 4, 100, 35, 5, 25);
+        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 4, 100, 30, 5, 25);
 
         for (int i = 0; i < circleImage.cols(); i++) {
             double[] data = circleImage.get(0, i);

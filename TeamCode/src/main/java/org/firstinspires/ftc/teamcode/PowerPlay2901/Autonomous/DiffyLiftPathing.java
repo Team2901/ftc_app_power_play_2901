@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="7 - Right Park", group="Iterative Opmode")
-public class IntelRealsense7 extends OpMode {
+@Autonomous(name="Diffy Lift Pathing", group="Iterative Opmode")
+public class DiffyLiftPathing extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -273,10 +273,24 @@ public class IntelRealsense7 extends OpMode {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                targetAngle = 90;
+                targetAngle = -90;
                 liftEngage = true;
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
+            if(!isTurning && !isMoving && !isLifting) {
+                xTolerance = 1;
+                autoState = AutoState.TURN_45;
+                telemetry.addData("Auto State", autoState);
+                move(12, 0);
+            }
+        }else if(autoState == AutoState.TURN_45) {
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.TURN_45;
+                telemetry.addData("Auto State", autoState);
+                isTurning = true;
+                targetAngle = 63;
+            }
+        } /*else if(autoState == AutoState.PARK){
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.PARK;
                 telemetry.addData("Auto State", autoState);
@@ -288,21 +302,18 @@ public class IntelRealsense7 extends OpMode {
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    move(5, 0);
+                    move(4, 0);
                     timer = true;
                     timerTime = 1500;
                     runtime.reset();
                 } else if(parking == 0){
-                    xTolerance = 1;
                     move(24, 0);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 }
             }
-        } else if(autoState == AutoState.PARK){
-
-        }
+        }*/
        /*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;

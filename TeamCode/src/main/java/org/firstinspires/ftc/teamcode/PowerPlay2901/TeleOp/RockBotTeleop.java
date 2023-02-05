@@ -33,6 +33,11 @@ public class RockBotTeleop extends OpMode {
         double forwardPower = -gamepad1.left_stick_y;
         double sidePower = -gamepad1.left_stick_x;
         double turnPower = gamepad1.right_stick_x;
+        if(gamepad2.left_trigger > .5) {
+            forwardPower = 0;
+            sidePower = 0;
+            turnPower = 0;
+        }
 
         if(gamepad1.right_bumper){
             leftPodPower = turnPower-forwardPower;
@@ -63,32 +68,33 @@ public class RockBotTeleop extends OpMode {
         if(gamepad2.y){
             target = 815;
             liftI = 0;
-            speedMod = 2.5;
         }
         if(gamepad2.x) {
             target = 575;
             liftI = 0;
-            speedMod = 2;
         }
         if(gamepad2.b) {
             target = 325;
             liftI = 0;
-            speedMod = 1.8;
         }
         if(gamepad2.a){
             target = 85;
             liftI = 0;
-            speedMod = 1.8;
         }
         if(gamepad2.dpad_left){
             target = 165;
             liftI = 0;
+        }
+
+        if(gamepad1.left_bumper){
+            speedMod = 1;
+        } else {
             speedMod = 1.8;
         }
 
 
         if(gamepad2.right_trigger > .5){
-            liftPower = liftPower(target - 65);
+            liftPower = liftPower(target - 85);
             feedForward = 0;
             liftI = 0;
         } else {
@@ -106,8 +112,8 @@ public class RockBotTeleop extends OpMode {
         }
         double scaleFactor = 12/result;
 
-//        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-//        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);

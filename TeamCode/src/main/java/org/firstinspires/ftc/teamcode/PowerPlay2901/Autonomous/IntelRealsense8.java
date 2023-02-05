@@ -268,7 +268,7 @@ public class IntelRealsense8 extends OpMode {
 
         }else if(firstRound) {
             move(0, 50);
-            xTolerance = 5;
+            xTolerance = 8;
             firstRound = false;
             parking = robot.pipeLine.winner;
         }else if(autoState == AutoState.MOVE_FORWARD){
@@ -276,9 +276,12 @@ public class IntelRealsense8 extends OpMode {
                 autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                randomInt = -12-dx;
+                randomInt = -10-dx;
                 targetAngle = -Math.toDegrees(Math.atan(10/(randomInt)));
                 liftEngage = true;
+            }else if(positionX - averagedX > xTolerance && positionY - averagedY < yTolerance){
+                autoState = AutoState.MOVE_BACK;
+                targetAngle = 90;
             }
         }else if(autoState == AutoState.TURN_45) {
             if (!isTurning && !isMoving && !isLifting) {
@@ -290,7 +293,7 @@ public class IntelRealsense8 extends OpMode {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
-                //robot.passthrough.setPosition(0.58);
+                robot.passthrough.setPosition(0.58);
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH){
             if(!isTurning && !isMoving) {
@@ -324,7 +327,7 @@ public class IntelRealsense8 extends OpMode {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_BACK;
                 telemetry.addData("Auto State", autoState);
-                //robot.claw.setPosition(0.915);
+                robot.claw.setPosition(0.915);
                 isLifting = true;
                 timer = true;
                 timerTime = 500;
@@ -334,8 +337,8 @@ public class IntelRealsense8 extends OpMode {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.RETRACT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-//                robot.passthrough.setPosition(.02);
-//                robot.claw.setPosition(.80);
+                robot.passthrough.setPosition(.02);
+                robot.claw.setPosition(.80);
             }
         }else if(autoState == AutoState.RETRACT_SLIDES){
             if(!isTurning && !isMoving && !isLifting) {
@@ -343,7 +346,7 @@ public class IntelRealsense8 extends OpMode {
                 telemetry.addData("Auto State", autoState);
                 xTolerance = 5;
                 yTolerance = 2;
-                move(-randomInt-3, -8+3);
+                move(-randomInt-5, -8+4);
                 timer = true;
                 timerTime = 1500;
                 runtime.reset();
@@ -570,7 +573,6 @@ public class IntelRealsense8 extends OpMode {
                isTurning = false;
            }
        }*/
-        runLift(liftTarget, dropping);
 
         if(improvedGamepad2.dpad_up.isInitialPress()){
             turnKp += 0.01;

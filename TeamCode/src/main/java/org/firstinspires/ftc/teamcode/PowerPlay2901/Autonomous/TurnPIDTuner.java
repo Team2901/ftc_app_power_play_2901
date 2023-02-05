@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="7 - Right Park", group="Iterative Opmode")
-public class IntelRealsense7 extends OpMode {
+@Autonomous(name="Turn PID Tuner", group="Iterative Opmode")
+public class TurnPIDTuner extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -172,7 +172,8 @@ public class IntelRealsense7 extends OpMode {
     boolean firstRound = true;
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, true);
+//        robot.init(hardwareMap, telemetry, true);
+        robot.init(hardwareMap);
         if (slamra == null) {
             slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
         }
@@ -206,15 +207,15 @@ public class IntelRealsense7 extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Auto State", autoState);
-        telemetry.addData("x error", dx);
-        telemetry.addData("y error", dy);
-        telemetry.addData("is turning", isTurning);
-        telemetry.addData("is moving", isMoving);
-        telemetry.addData("target angle", targetAngle);
-        telemetry.addData("current angle", robot.getAngle());
-        telemetry.addData("turn power", turnPower);
-        telemetry.addData("parking zone", parking);
+//        telemetry.addData("Auto State", autoState);
+//        telemetry.addData("x error", dx);
+//        telemetry.addData("y error", dy);
+//        telemetry.addData("is turning", isTurning);
+//        telemetry.addData("is moving", isMoving);
+//        telemetry.addData("target angle", targetAngle);
+//        telemetry.addData("current angle", robot.getAngle());
+//        telemetry.addData("turn power", turnPower);
+//        telemetry.addData("parking zone", parking);
 
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
@@ -238,17 +239,21 @@ public class IntelRealsense7 extends OpMode {
         averagedY = ((offsetY*0) + (pos.y*1));
 
         //Changes target Position
-       /*if (improvedGamepad.dpad_right.isInitialPress()) {
-           move(24, 0);
+       if (improvedGamepad.dpad_right.isInitialPress()) {
+           isTurning = true;
+           targetAngle = -90;
        } else if (improvedGamepad.dpad_left.isInitialPress()) {
-           move(-24, 0);
+           isTurning = true;
+           targetAngle = 90;
        } else if (improvedGamepad.dpad_up.isInitialPress()) {
-           move(0, 72);
+           isTurning = true;
+           targetAngle = 45;
        } else if (improvedGamepad.dpad_down.isInitialPress()) {
-           move(0, -72);
+           isTurning = true;
+           targetAngle = -45;
        }
        //Changes target angle
-       if(improvedGamepad.a.isInitialPress()) {
+       /*if(improvedGamepad.a.isInitialPress()) {
            liftTarget = 415;
        } else if(improvedGamepad.b.getValue()){
            targetAngle = 90;
@@ -262,7 +267,7 @@ public class IntelRealsense7 extends OpMode {
         //parking = pipeline.winner;
         //I just can't seem to get a value out of it other than -1
 
-        if(robot.pipeLine.winner == -1){}
+        /*if(robot.pipeLine.winner == -1){}
         else if(firstRound) {
             move(0, 52);
             xTolerance = 100;
@@ -288,12 +293,11 @@ public class IntelRealsense7 extends OpMode {
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    move(5, 0);
+                    move(4, 0);
                     timer = true;
                     timerTime = 1500;
                     runtime.reset();
                 } else if(parking == 0){
-                    xTolerance = 1;
                     move(24, 0);
                     timer = true;
                     timerTime = 5000;
@@ -302,7 +306,7 @@ public class IntelRealsense7 extends OpMode {
             }
         } else if(autoState == AutoState.PARK){
 
-        }
+        }*/
        /*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
@@ -383,10 +387,10 @@ public class IntelRealsense7 extends OpMode {
             } else if (outputLeft < -1) {
                 outputLeft = -1;
             }
-            telemetry.addData("angle to Traget", angleToTarget);
-            telemetry.addData("atan2 ", Math.atan2(dy, dx));
-            telemetry.addData("x error", dx);
-            telemetry.addData("y error", dy);
+//            telemetry.addData("angle to Traget", angleToTarget);
+//            telemetry.addData("atan2 ", Math.atan2(dy, dx));
+//            telemetry.addData("x error", dx);
+//            telemetry.addData("y error", dy);
 
 
         } else {
@@ -434,7 +438,7 @@ public class IntelRealsense7 extends OpMode {
             outputRight = turnPower;
             outputLeft = -turnPower;
             telemetry.addData("turn power", turnPower);
-            if (Math.abs(AngleUnit.normalizeDegrees(targetAngle - robot.getAngle())) < 3 && Math.abs(dTurn) < 10) {
+            if (Math.abs(AngleUnit.normalizeDegrees(targetAngle - robot.getAngle())) < 2 && Math.abs(dTurn) < 10) {
                 isTurning = false;
             }
         }
@@ -490,19 +494,22 @@ public class IntelRealsense7 extends OpMode {
         //runLift(liftTarget, dropping);
 
         if(improvedGamepad2.dpad_up.isInitialPress()){
-            turnKp += 0.01;
+            ktp += 0.01;
         } else if(improvedGamepad2.dpad_down.isInitialPress()){
-            turnKp -= 0.01;
+            ktp -= 0.01;
         } else if(improvedGamepad2.dpad_left.isInitialPress()){
-            turnKi -= 0.01;
+            kti -= 0.01;
         } else if(improvedGamepad2.dpad_right.isInitialPress()){
-            turnKi += 0.01;
+            kti += 0.01;
         } else if(improvedGamepad2.y.isInitialPress()){
-            turnKd += 0.01;
+            ktd += 0.01;
         } else if(improvedGamepad2.a.isInitialPress()){
-            turnKd -= 0.01;
+            ktd -= 0.01;
         }
 
+        telemetry.addData("P - Turn", ktp);
+        telemetry.addData("I - Turn", kti);
+        telemetry.addData("D - Turn", ktd);
        /*telemetry.addData("isturning", isTurning);
        telemetry.addData("isMoving", isMoving);
        telemetry.addData("Auto State", autoState);
@@ -716,7 +723,7 @@ public class IntelRealsense7 extends OpMode {
 
     public double liftPower(int target){
         int error = robot.liftOne.getCurrentPosition() - target;
-        telemetry.addData("error", error);
+        //telemetry.addData("error", error);
         double secs = runtimeLift.seconds();
         runtimeLift.reset();
         liftD = (error - liftP) / secs;
