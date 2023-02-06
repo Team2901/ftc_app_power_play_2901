@@ -24,6 +24,7 @@ public class DiffyLiftPathing extends OpMode {
 
     //Don't need to use this unless camera is not facing a cardinal direction in relation to robot
     final double angleOffset = 0;
+    final int maxCycles = 5;
 
     T265Camera.CameraUpdate up;
 
@@ -33,13 +34,9 @@ public class DiffyLiftPathing extends OpMode {
     Translation2d translation;
     Rotation2d rotation;
 
-    //public ObjectDetectionPipeline pipeline;
-
     ElapsedTime time = new ElapsedTime();
     ElapsedTime impTime = new ElapsedTime();
-
     private ElapsedTime runtime = new ElapsedTime();
-
     private ElapsedTime matchTimer = new ElapsedTime();
 
     EarlyDiffyHardware robot = new EarlyDiffyHardware();
@@ -168,6 +165,7 @@ public class DiffyLiftPathing extends OpMode {
 
     //Ignore for now, use later for parking locations using camera
     public int parking = -1;
+    int cycle = 0;
 
     boolean firstRound = true;
     @Override
@@ -273,7 +271,7 @@ public class DiffyLiftPathing extends OpMode {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                targetAngle = -90;
+                targetAngle = 90;
                 liftEngage = true;
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
@@ -285,10 +283,23 @@ public class DiffyLiftPathing extends OpMode {
             }
         }else if(autoState == AutoState.TURN_45) {
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
                 targetAngle = 63;
+                if(cycle == maxCycles || matchTimer.seconds() > 23){
+                    autoState = AutoState.PARK;
+                }else{
+                    autoState = AutoState.TURN_N45;
+                    cycle++;
+                }
+            }
+        }else if(autoState == AutoState.TURN_N45){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.TURN_45;
+                telemetry.addData("Auto State", autoState);
+                isTurning = true;
+                targetAngle = -90;
+                liftEngage = true;
             }
         } /*else if(autoState == AutoState.PARK){
             if (!isTurning && !isMoving && !isLifting) {
