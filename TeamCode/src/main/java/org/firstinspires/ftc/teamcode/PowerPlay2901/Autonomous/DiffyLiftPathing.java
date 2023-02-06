@@ -286,45 +286,47 @@ public class DiffyLiftPathing extends OpMode {
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
                 targetAngle = 63;
-                if(cycle == maxCycles || matchTimer.seconds() > 23){
-                    autoState = AutoState.PARK;
-                }else{
-                    autoState = AutoState.TURN_N45;
-                    cycle++;
-                }
+                autoState = AutoState.TURN_N45;
             }
         }else if(autoState == AutoState.TURN_N45){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_45;
+                if(cycle == maxCycles || matchTimer.seconds() > 23){
+                    autoState = AutoState.PARK;
+                }else{
+                    autoState = AutoState.TURN_45;
+                    cycle++;
+                }
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
                 targetAngle = -90;
                 liftEngage = true;
             }
-        } /*else if(autoState == AutoState.PARK){
+        }else if(autoState == AutoState.PARK){
             if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.PARK;
+                autoState = AutoState.FINAL_TURN;
                 telemetry.addData("Auto State", autoState);
+
                 if(parking == 1){
                     xTolerance = 1;
-                    move(-17, 0);
+                    moveTo(-17, 52);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    move(4, 0);
+                    moveTo(4, 52);
                     timer = true;
                     timerTime = 1500;
                     runtime.reset();
                 } else if(parking == 0){
-                    move(24, 0);
+                    xTolerance = 1;
+                    moveTo(24, 52);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 }
             }
-        }*/
+        }
        /*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
