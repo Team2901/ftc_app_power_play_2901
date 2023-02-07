@@ -22,6 +22,7 @@ public class RockBotTeleop extends OpMode {
     public double rightTurnPower = 0;
     double moveAngle;
     double speedMod = 1.8;
+    double resetSpeedMod = 1.8;
 
     @Override
     public void init() {
@@ -32,7 +33,7 @@ public class RockBotTeleop extends OpMode {
     public void loop() {
         double forwardPower = -gamepad1.left_stick_y;
         double sidePower = -gamepad1.left_stick_x;
-        double turnPower = gamepad1.right_stick_x;
+        double turnPower = gamepad1.right_stick_x - .2*sidePower;
         if(gamepad2.left_trigger > .5) {
             forwardPower = 0;
             sidePower = 0;
@@ -89,7 +90,13 @@ public class RockBotTeleop extends OpMode {
         if(gamepad1.left_bumper){
             speedMod = 1;
         } else {
-            speedMod = 1.8;
+            speedMod = resetSpeedMod;
+        }
+
+        if(gamepad1.b){
+            resetSpeedMod = 3;
+        } else if(gamepad1.x){
+            resetSpeedMod = 1.8;
         }
 
 
@@ -168,7 +175,7 @@ public class RockBotTeleop extends OpMode {
     double dAngleRight = 0;
 
     public double rightPodTurn(double angle){
-        rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition())/8.95;
+        rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition())/8.925;
         double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
         if(!gamepad1.start && (error >= 90 || error <= -90)){
             error = AngleUnit.normalizeDegrees(error-180);
