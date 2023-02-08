@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -49,6 +50,8 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     public Servo passthrough;
     public Servo claw;
 
+    public RevBlinkinLedDriver underglow;
+
     public BNO055IMU imu;
 
     public OpenCvCamera camera;
@@ -67,6 +70,7 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
         claw = hardwareMap.get(Servo.class, "claw");
         odoLeft = hardwareMap.get(DcMotor.class, "left encoder");
         odoRight = hardwareMap.get(DcMotor.class, "right encoder");
+        underglow = hardwareMap.get(RevBlinkinLedDriver.class, "underglow");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);

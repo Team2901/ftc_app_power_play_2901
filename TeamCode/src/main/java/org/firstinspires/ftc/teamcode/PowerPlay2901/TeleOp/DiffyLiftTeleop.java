@@ -9,14 +9,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
-@TeleOp(name = "Dwayne TeleOp", group = "AAAAAAAAAAAAhRockBot")
-public class RockBotTeleop extends OpMode {
+@TeleOp(name = "Diffy Lift Teleop", group = "AAAAAAAAAAAAhRockBot")
+public class DiffyLiftTeleop extends OpMode {
     RockBotHardware robot = new RockBotHardware();
-    private ElapsedTime runtime = new ElapsedTime();
 
     double liftPower = 0;
+    double extendPower = 0;
     double feedForward = .3;
-    int target = 65;
+    int liftTarget = 85;
+    int extendTarget = 0;
     double leftPodPower = 0;
     double rightPodPower = 0;
     public double leftTurnPower = 0;
@@ -42,25 +43,13 @@ public class RockBotTeleop extends OpMode {
             turnPower = 0;
         }
 
-        if(gamepad1.right_bumper){
-            leftPodPower = turnPower-forwardPower;
-            rightPodPower = -turnPower-forwardPower;
-            leftTurnPower = leftPodTurn(0);
-            rightTurnPower = rightPodTurn(0);
-        } else {
-            moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
-            //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
-            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
-            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
-            leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
-            rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
-        }
 
-        if(gamepad2.dpad_down){
-            robot.passthrough.setPosition(.02);
-        } else if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.7);
-        }
+        moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
+        //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
+        leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
+        rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
+        leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
+        rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
 
         if(gamepad2.left_trigger > 0.5){
             robot.claw.setPosition(.915);
@@ -71,23 +60,23 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.y){
-            target = 815;
+            liftTarget = 815;
             liftI = 0;
         }
         if(gamepad2.x) {
-            target = 575;
+            liftTarget = 575;
             liftI = 0;
         }
         if(gamepad2.b) {
-            target = 325;
+            liftTarget = 325;
             liftI = 0;
         }
         if(gamepad2.a){
-            target = 85;
+            liftTarget = 85;
             liftI = 0;
         }
         if(gamepad2.dpad_left){
-            target = 165;
+            liftTarget = 165;
             liftI = 0;
         }
 
@@ -103,13 +92,14 @@ public class RockBotTeleop extends OpMode {
             resetSpeedMod = 1.8;
         }
 
+        extendPower = extendPower(extendTarget);
 
         if(gamepad2.right_trigger > .5){
-            liftPower = liftPower(target - 85);
+            liftPower = liftPower(liftTarget - 85);
             feedForward = 0;
             liftI = 0;
         } else {
-            liftPower = liftPower(target);
+            liftPower = liftPower(liftTarget);
             feedForward = .3;
             telemetry.addData("liftPower", liftPower);
         }
@@ -123,8 +113,8 @@ public class RockBotTeleop extends OpMode {
         }
         double scaleFactor = 12/result;
 
-        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftOne.setPower((liftPower + extendPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - extendPower - feedForward) * scaleFactor);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -156,7 +146,7 @@ public class RockBotTeleop extends OpMode {
             leftPodPower = -leftPodPower;
         }
         double secs = runtimePodLeft.seconds();
-        runtime.reset();
+        runtimePodLeft.reset();
         dAngleLeft = (error - pAngleLeft) / secs;
         iAngleLeft = iAngleLeft + (error * secs);
         pAngleLeft = error;
@@ -186,7 +176,7 @@ public class RockBotTeleop extends OpMode {
             rightPodPower = -rightPodPower;
         }
         double secs = runtimePodRight.seconds();
-        runtime.reset();
+        runtimePodRight.reset();
         dAngleRight = (error - pAngleRight) / secs;
         iAngleRight = iAngleRight + (error * secs);
         pAngleRight = error;
@@ -213,10 +203,10 @@ public class RockBotTeleop extends OpMode {
     double liftD = 0;
 
     public double liftPower(int target){
-        int error = robot.liftOne.getCurrentPosition() - target;
-        telemetry.addData("error", error);
+        int error = (robot.liftTwo.getCurrentPosition() + robot.liftOne.getCurrentPosition())/2 - target;
+        telemetry.addData("lift error", error);
         double secs = runtimeLift.seconds();
-        telemetry.addData("loop time", secs);
+        telemetry.addData("lift loop time", secs);
         runtimeLift.reset();
         liftD = (error - liftP) / secs;
         liftI = liftI + (error * secs);
@@ -228,6 +218,35 @@ public class RockBotTeleop extends OpMode {
         }
         if(total < -1){
             liftI = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    double kep = 0;
+    double kei = 0;
+    double ked = 0;
+    ElapsedTime runtimeExtend = new ElapsedTime();
+    double extendP = 0;
+    double extendI = 0;
+    double extendD = 0;
+
+    public double extendPower(int target){
+        int error = (robot.liftTwo.getCurrentPosition() - robot.liftOne.getCurrentPosition())/2 - target;
+        telemetry.addData("extend error", error);
+        double secs = runtimeExtend.seconds();
+        telemetry.addData("extend loop time", secs);
+        runtimeExtend.reset();
+        extendD = (error - extendP) / secs;
+        extendI = extendI + (error * secs);
+        extendP = error;
+        double total = (kep* extendP + kei* extendI + ked* extendD)/100;
+        if(total > 1){
+            extendI = 0;
+            total = 1;
+        }
+        if(total < -1){
+            extendI = 0;
             total = -1;
         }
         return total;
