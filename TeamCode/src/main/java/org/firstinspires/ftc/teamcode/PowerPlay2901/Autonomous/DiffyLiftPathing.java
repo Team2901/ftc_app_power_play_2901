@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
@@ -282,6 +283,9 @@ public class DiffyLiftPathing extends OpMode {
                 autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
                 turnTo(45);
+                timer = true;
+                runtime.reset();
+                timerTime = 1100;
                 liftEngage = true;
             }
         }else if(autoState == AutoState.TURN_45){
@@ -303,6 +307,9 @@ public class DiffyLiftPathing extends OpMode {
                 autoState = AutoState.TURN_452;
                 telemetry.addData("Auto State", autoState);
                 turnTo(-90);
+                timer = true;
+                runtime.reset();
+                timerTime = 1100;
 //                timer = true;
 //                runtime.reset();
 //                timerTime = 1500;
@@ -314,15 +321,15 @@ public class DiffyLiftPathing extends OpMode {
             }
         }else if(autoState == AutoState.MOVE_BACK){
             if((!isTurning && !isMoving && !isLifting)) {
-                if(cycle == maxCycles || matchTimer.seconds()>27) {
+                if(cycle == maxCycles || matchTimer.seconds()>22) {
                     autoState = AutoState.PARK;
                 } else {
                     autoState = AutoState.MOVE_FORWARD2;
                     moveInchesForward(-26);
                     cycle++;
                 }
-            }else if(robot.rightTouch.isPressed() && robot.leftTouch.isPressed()){
-                if(cycle == maxCycles || matchTimer.seconds()>27) {
+            }else if(robot.rightTouch.isPressed() || robot.leftTouch.isPressed()){
+                if(cycle == maxCycles || matchTimer.seconds()>22) {
                     autoState = AutoState.PARK;
                 } else {
                     autoState = AutoState.MOVE_FORWARD2;
@@ -458,6 +465,7 @@ public class DiffyLiftPathing extends OpMode {
         telemetry.addData("right touch", robot.rightTouch.isPressed());
         telemetry.addData("left touch", robot.leftTouch.isPressed());
         telemetry.addData("error angle", targetAngle - robot.getAngle());
+        telemetry.addData("Distance sensor", robot.distanceSensor.getDistance(DistanceUnit.INCH));
 
         //Creates dead zone radius larger than target
 
