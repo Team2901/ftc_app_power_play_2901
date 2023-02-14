@@ -250,7 +250,7 @@ public class TurnPIDTuner extends OpMode {
            targetAngle = 45;
        } else if (improvedGamepad.dpad_down.isInitialPress()) {
            isTurning = true;
-           targetAngle = -45;
+           targetAngle = 0;
        }
        //Changes target angle
        /*if(improvedGamepad.a.isInitialPress()) {
@@ -690,9 +690,9 @@ public class TurnPIDTuner extends OpMode {
     double pTurn = 0;
     double iTurn = 0;
     double dTurn = 0;
-    double ktp = 1.52;
-    double kti = 0.06;
-    double ktd = 0.41;
+    double ktp = 1.47;
+    double kti = 0.02;
+    double ktd = 0.42;
 
     public double turnPID(double error){
         double secs = runtimeTurn.seconds();

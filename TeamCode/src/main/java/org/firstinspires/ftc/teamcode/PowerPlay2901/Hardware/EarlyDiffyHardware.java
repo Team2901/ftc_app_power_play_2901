@@ -6,8 +6,10 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -51,6 +53,9 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
     public Servo claw;
 //    public Servo clawTwo;
     //public Rev2mDistanceSensor clawSensor;
+    public DistanceSensor distanceSensor;
+    public TouchSensor leftTouch;
+    public TouchSensor rightTouch;
 
     public int currentLeftPosition = 0;
     public int currentRightPosition = 0;
@@ -92,6 +97,10 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
 //        clawOne.setPosition(0.12);
 //        clawTwo.setPosition(0.18);;
 
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distance");
+        leftTouch = hardwareMap.get(TouchSensor.class, "left touch");
+        rightTouch = hardwareMap.get(TouchSensor.class, "right touch");
+
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -104,6 +113,9 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
         liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        odoLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        odoRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         if (useCam) {

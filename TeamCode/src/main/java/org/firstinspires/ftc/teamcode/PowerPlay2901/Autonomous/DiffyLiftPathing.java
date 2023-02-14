@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
@@ -24,7 +25,7 @@ public class DiffyLiftPathing extends OpMode {
 
     //Don't need to use this unless camera is not facing a cardinal direction in relation to robot
     final double angleOffset = 0;
-    final int maxCycles = 5;
+    final int maxCycles = 2;
 
     T265Camera.CameraUpdate up;
 
@@ -47,6 +48,7 @@ public class DiffyLiftPathing extends OpMode {
     public static final double leftRightDistance = 8.375; //Distance between left and right odometry wheels
     public static final double midpointBackDistance = 7.25;
     public static final double inchPerTick = wheelCircumference / encoderTicksPerWheelRev;
+    public static final double encoderTicksPerInch = encoderTicksPerWheelRev/wheelCircumference;
     public static final double wheelCircumferenceBack = (2 * Math.PI);
     public static final double backInchPerTick = wheelCircumferenceBack / encoderTicksPerWheelRev;
 
@@ -70,7 +72,7 @@ public class DiffyLiftPathing extends OpMode {
     //PID constants for moving
     double kp = 0.07;
     double ki = 0;
-    double kd = 0;
+    double kd = 0.01;
     final double max_i = 1;
 
     double dx = 0;
@@ -167,6 +169,9 @@ public class DiffyLiftPathing extends OpMode {
     public int parking = -1;
     int cycle = 0;
 
+    double leftTarget;
+    double rightTarget;
+
     boolean firstRound = true;
     @Override
     public void init() {
@@ -187,6 +192,8 @@ public class DiffyLiftPathing extends OpMode {
         positionY = -cameraYOffset;
         autoState = AutoState.MOVE_FORWARD;
 
+        leftTarget = robot.odoLeft.getCurrentPosition();
+
         //julia circle vision
         //ElapsedTime stopwatch = new ElapsedTime();
         //double seconds = stopwatch.seconds();
@@ -204,34 +211,35 @@ public class DiffyLiftPathing extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Auto State", autoState);
-        telemetry.addData("x error", dx);
-        telemetry.addData("y error", dy);
-        telemetry.addData("is turning", isTurning);
-        telemetry.addData("is moving", isMoving);
-        telemetry.addData("target angle", targetAngle);
-        telemetry.addData("current angle", robot.getAngle());
-        telemetry.addData("turn power", turnPower);
-        telemetry.addData("parking zone", parking);
-
-        up = slamra.getLastReceivedCameraUpdate();
-        // We divide by 0.0254 to convert meters to inches
-        translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
-        rotation = up.pose.getRotation();
         improvedGamepad.update();
         improvedGamepad2.update();
+        telemetry.addData("Auto State", autoState);
+//        telemetry.addData("x error", dx);
+//        telemetry.addData("y error", dy);
+//        telemetry.addData("is turning", isTurning);
+//        telemetry.addData("is moving", isMoving);
+//        telemetry.addData("target angle", targetAngle);
+//        telemetry.addData("current angle", robot.getAngle());
+//        telemetry.addData("turn power", turnPower);
+//        telemetry.addData("parking zone", parking);
+//        telemetry.addData("left encoders", robot.odoLeft.getCurrentPosition());
+//        telemetry.addData("left target", leftTarget);
+
+        up = slamra.getLastReceivedCameraUpdate();
+        translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
+        rotation = up.pose.getRotation();
         if (up == null) return;
 
-
-//        arrowX = Math.cos(28.17859 + rotation.getRadians()) * robotRadius;
-//        arrowY = Math.sin(28.17859 + rotation.getRadians()) * robotRadius;
         double x1 = translation.getX(), y1 = translation.getY();
         double fieldTheta = rotation.getDegrees() + angleOffset - initTheta;
+        //Adjusts for camera initial positional offset
         offsetX = (x1 - (cameraXOffset * Math.cos(rotation.getRadians())));
         offsetY = (y1 - (cameraYOffset * Math.cos(rotation.getRadians())));
+        //Adjusts for camera initial angle offset
         double adjustX = ((offsetX * Math.cos(angleOffset)) - (offsetY * Math.sin(angleOffset)));
         double adjustY = ((offsetX * Math.sin(angleOffset)) + (offsetY * Math.cos(angleOffset)));
 
+        //Average of camera and odometry
         averagedX = ((offsetX*0) + (pos.x*1));
         averagedY = ((offsetY*0) + (pos.y*1));
 
@@ -256,50 +264,75 @@ public class DiffyLiftPathing extends OpMode {
            targetAngle = -90;
        }*/
 
-        //For parking, set the 'parking' variable to pipeline.winner
-        //parking = pipeline.winner;
-        //I just can't seem to get a value out of it other than -1
-
         if(robot.pipeLine.winner == -1){}
         else if(firstRound) {
-            move(0, 52);
-            xTolerance = 100;
+            moveInchesForward(52);
             firstRound = false;
             parking = robot.pipeLine.winner;
         }else if(autoState == AutoState.MOVE_FORWARD){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.EXTEND_PASSTHROUGH;
+                autoState = AutoState.DELIVER;
                 telemetry.addData("Auto State", autoState);
-                isTurning = true;
-                targetAngle = 90;
-                liftEngage = true;
+                timer = true;
+                runtime.reset();
+                timerTime = 1500;
             }
-        }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
+        }else if(autoState == AutoState.DELIVER){
             if(!isTurning && !isMoving && !isLifting) {
-                xTolerance = 1;
                 autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
-                move(12, 0);
+                turnTo(45);
+                liftEngage = true;
             }
-        }else if(autoState == AutoState.TURN_45) {
+        }else if(autoState == AutoState.TURN_45){
             if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.INCH_FORWARD;
+                xTolerance = 1;
+                yTolerance = 1;
+                moveInchesForward(10);
+            }
+        }else if(autoState == AutoState.INCH_FORWARD){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.INCH_BACK;
+                xTolerance = 1;
+                yTolerance = 1;
+                moveInchesForward(-12);
+            }
+        }else if(autoState == AutoState.INCH_BACK){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.TURN_452;
                 telemetry.addData("Auto State", autoState);
-                isTurning = true;
-                targetAngle = 63;
-                autoState = AutoState.TURN_N45;
+                turnTo(-90);
+//                timer = true;
+//                runtime.reset();
+//                timerTime = 1500;
             }
-        }else if(autoState == AutoState.TURN_N45){
+        }else if(autoState == AutoState.TURN_452){
             if(!isTurning && !isMoving && !isLifting) {
-                if(cycle == maxCycles || matchTimer.seconds() > 23){
+                autoState = AutoState.MOVE_BACK;
+                moveInchesForward(26);
+            }
+        }else if(autoState == AutoState.MOVE_BACK){
+            if((!isTurning && !isMoving && !isLifting)) {
+                if(cycle == maxCycles || matchTimer.seconds()>27) {
                     autoState = AutoState.PARK;
-                }else{
-                    autoState = AutoState.TURN_45;
+                } else {
+                    autoState = AutoState.MOVE_FORWARD2;
+                    moveInchesForward(-26);
                     cycle++;
                 }
-                telemetry.addData("Auto State", autoState);
-                isTurning = true;
-                targetAngle = -90;
-                liftEngage = true;
+            }else if(robot.rightTouch.isPressed() && robot.leftTouch.isPressed()){
+                if(cycle == maxCycles || matchTimer.seconds()>27) {
+                    autoState = AutoState.PARK;
+                } else {
+                    autoState = AutoState.MOVE_FORWARD2;
+                    moveInchesForward(-26);
+                    cycle++;
+                }
+            }
+        }else if(autoState == AutoState.MOVE_FORWARD2){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.MOVE_FORWARD;
             }
         }else if(autoState == AutoState.PARK){
             if (!isTurning && !isMoving && !isLifting) {
@@ -308,19 +341,19 @@ public class DiffyLiftPathing extends OpMode {
 
                 if(parking == 1){
                     xTolerance = 1;
-                    moveTo(-17, 52);
+                    moveInchesForward(-48);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    moveTo(4, 52);
+                    moveInchesForward(-24);
                     timer = true;
-                    timerTime = 1500;
+                    timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 0){
                     xTolerance = 1;
-                    moveTo(24, 52);
+                    moveInchesForward(-4);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
@@ -372,16 +405,12 @@ public class DiffyLiftPathing extends OpMode {
        }*/
 
         //updates odometry
-        odometry();
+        //odometry();
 
-        dx = ((positionX) - (averagedX));
-        dy = ((positionY) - (averagedY));
-        double angle = Math.atan2(-dx, dy+.001);
-        currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
-        angleToTarget = Math.toDegrees(angle);
+        currentError = (leftTarget*inchPerTick - robot.odoLeft.getCurrentPosition()*inchPerTick);
 
         //Movement PID code
-        if (!isTurning && isMoving && (Math.abs(((positionX) - (averagedX))) > 0 || Math.abs((positionY) - (averagedY)) > 0)) {
+        if (!isTurning && isMoving && (Math.abs(((leftTarget) - (robot.odoLeft.getCurrentPosition()))) > 0)) {
             //If pods are moving perpendicular change this value by +90 or -90
             //If pods are moving opposite direction change this value by +180/-180
 
@@ -407,10 +436,10 @@ public class DiffyLiftPathing extends OpMode {
             } else if (outputLeft < -1) {
                 outputLeft = -1;
             }
-            telemetry.addData("angle to Traget", angleToTarget);
-            telemetry.addData("atan2 ", Math.atan2(dy, dx));
-            telemetry.addData("x error", dx);
-            telemetry.addData("y error", dy);
+//            telemetry.addData("angle to Traget", angleToTarget);
+//            telemetry.addData("atan2 ", Math.atan2(dy, dx));
+//            telemetry.addData("x error", dx);
+//            telemetry.addData("y error", dy);
 
 
         } else {
@@ -426,12 +455,15 @@ public class DiffyLiftPathing extends OpMode {
 //        telemetry.addData("position y", positionY);
 //        telemetry.addData("camera x", averagedX);
 //        telemetry.addData("camera y", averagedY);
+        telemetry.addData("right touch", robot.rightTouch.isPressed());
+        telemetry.addData("left touch", robot.leftTouch.isPressed());
+        telemetry.addData("error angle", targetAngle - robot.getAngle());
 
         //Creates dead zone radius larger than target
 
         double error = AngleUnit.normalizeDegrees(angleToTarget - robot.getAngle());
         //turnPower = -turnPID(error);
-        outputLeft *= Math.cos(Math.toRadians(error));
+        //outputLeft *= Math.cos(Math.toRadians(error));
         if(outputLeft > 1){
             outputLeft = 1;
         } else if(outputLeft < -1){
@@ -452,12 +484,11 @@ public class DiffyLiftPathing extends OpMode {
         }
 
         if(isTurning) {
-            telemetry.addData("target angle", targetAngle);
-            telemetry.addData("current angle", robot.getAngle());
+            //telemetry.addData("target angle", targetAngle);
             turnPower = turnPID(targetAngle - robot.getAngle());
             outputRight = turnPower;
             outputLeft = -turnPower;
-            telemetry.addData("turn power", turnPower);
+            //telemetry.addData("turn power", turnPower);
             if (Math.abs(AngleUnit.normalizeDegrees(targetAngle - robot.getAngle())) < 3 && Math.abs(dTurn) < 10) {
                 isTurning = false;
             }
@@ -470,7 +501,7 @@ public class DiffyLiftPathing extends OpMode {
             timer = false;
         }
 
-        if (!isTurning && isMoving && (Math.abs(dx) < xTolerance && Math.abs(dy) < yTolerance)) {
+        if (!isTurning && isMoving && (Math.abs(leftTarget*inchPerTick - robot.odoLeft.getCurrentPosition()*inchPerTick)) < yTolerance) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
@@ -489,6 +520,11 @@ public class DiffyLiftPathing extends OpMode {
             robot.leftTwo.setVelocity(0);
             robot.rightOne.setVelocity(0);
             robot.rightTwo.setVelocity(0);
+        } else if(isMoving){
+            robot.leftOne.setVelocity(((outputLeft-(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+leftTurnPower)*2500);
+            robot.leftTwo.setVelocity(((outputLeft-(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-leftTurnPower)*2500);
+            robot.rightOne.setVelocity(((outputRight+(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+rightTurnPower)*2500);
+            robot.rightTwo.setVelocity(((outputRight+(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-rightTurnPower)*2500);
         } else {
             robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
             robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
@@ -707,9 +743,9 @@ public class DiffyLiftPathing extends OpMode {
     double pTurn = 0;
     double iTurn = 0;
     double dTurn = 0;
-    double ktp = 1.52;
-    double kti = 0.06;
-    double ktd = 0.41;
+    double ktp = 1.47;
+    double kti = 0.02;
+    double ktd = 0.42;
 
     public double turnPID(double error){
         double secs = runtimeTurn.seconds();
@@ -759,6 +795,20 @@ public class DiffyLiftPathing extends OpMode {
             isLifting = false;
         }
         return total;
+    }
+
+    public void moveInchesForward(double inches){
+        robot.odoLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.odoRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftTarget = robot.odoLeft.getCurrentPosition() + inches*encoderTicksPerInch;
+        rightTarget = robot.odoRight.getCurrentPosition() + inches*encoderTicksPerInch;
+        isMoving = true;
+    }
+
+
+    public void turnTo(double degrees){
+        isTurning = true;
+        targetAngle = degrees;
     }
 
 }

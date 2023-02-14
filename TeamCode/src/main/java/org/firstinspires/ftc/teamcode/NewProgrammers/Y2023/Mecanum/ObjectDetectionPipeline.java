@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-//import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.IntelRealsense2;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -10,7 +9,6 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class ObjectDetectionPipeline extends OpenCvPipeline {
-//    IntelRealsense2 auto = new IntelRealsense2();
     Mat lastImage = null;
     private Telemetry telemetry;
     public int winner = -1;
@@ -19,15 +17,11 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
     public int count1 = 0;
     public int count2 = 0;
     public int count0 = 0;
-    public int preCount0 = 0;
-    public int preCount1 = 0;
-    public int preCount2 = 0;
 
     int count = 0;
     public ObjectDetectionPipeline(Telemetry telemetry){
         this.telemetry = telemetry;
     }
-
 
     @Override
     public Mat processFrame(Mat input) {
@@ -76,20 +70,16 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
             Imgproc.circle(cropImg, center, 1, new Scalar(255, 255, 255), 2, 8, 0);
             // circle outline
             int radius = (int) Math.round(data[2]);
-//            telemetry.addData("Radius: ", radius);
             Imgproc.circle(cropImg, center, radius, new Scalar(255, 255, 255), 2, 8, 0);
         }
         if (framesProcessed < 400) {
             if (circleImage.cols() == 1) {
-//                telemetry.addData("1 circle", true);
                 count1++;
             }
         if (circleImage.cols() == 2) {
-//            telemetry.addData("2 circles", true);
             count2++;
         }
         if (circleImage.cols() == 0) {
-//            telemetry.addData("0 circles", true);
             count0++;
 
         }
@@ -108,20 +98,14 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         if(framesProcessed > 45) {
             if (count2 > 30 && count2 > count1 && count1 < 45) {
                 winner = 2;
-//                auto.parking = 2;
-//                telemetry.addData("2 circles", true);
             }
             //if the amount of times that there is one is over 15 and it is greater than seeing 2 circles
             if (count1 > 40 && winner != 2) {
                 winner = 1;
-//                auto.parking = 1;
-//                telemetry.addData("1 circle", true);
             }
             //only if 0 circles is greater than the amount of times that it sees 1 and 2 circles
             if (count0 > count1 && count0 > count2 && count0>20 && winner != 2 && winner!= 1) {
                 winner = 0;
-//                auto.parking = 0;
-//                telemetry.addData("0 circles", true);
             }
         }
         telemetry.addData("Winner is ", winner);
@@ -131,9 +115,6 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         //return blurImage;*/
 
         return cropImg;
-    }
-    public int returnWinner(){
-        return winner;
     }
 }
 
