@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -194,6 +195,7 @@ public class DiffyLiftPathing extends OpMode {
         autoState = AutoState.MOVE_FORWARD;
 
         leftTarget = robot.odoLeft.getCurrentPosition();
+        robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 
         //julia circle vision
         //ElapsedTime stopwatch = new ElapsedTime();
@@ -290,6 +292,16 @@ public class DiffyLiftPathing extends OpMode {
             }
         }else if(autoState == AutoState.TURN_45){
             if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.LIFT_SLIDES;
+                liftTarget = 600;
+                isLifting = true;
+                timer = true;
+                runtime.reset();
+                timerTime = 2000;
+                liftEngage = true;
+            }
+        }else if(autoState == AutoState.LIFT_SLIDES){
+            if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_FORWARD;
                 xTolerance = 1;
                 yTolerance = 1;
@@ -318,6 +330,7 @@ public class DiffyLiftPathing extends OpMode {
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.MOVE_BACK;
                 moveInchesForward(26);
+                robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE);
             }
         }else if(autoState == AutoState.MOVE_BACK){
             if((!isTurning && !isMoving && !isLifting)) {

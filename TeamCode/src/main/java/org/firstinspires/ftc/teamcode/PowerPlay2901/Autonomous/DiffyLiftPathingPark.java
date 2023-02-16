@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Diffy Lift Pathing", group="Iterative Opmode")
+@Autonomous(name="Diffy Lift Pathing Park", group="Iterative Opmode")
 public class DiffyLiftPathingPark extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;

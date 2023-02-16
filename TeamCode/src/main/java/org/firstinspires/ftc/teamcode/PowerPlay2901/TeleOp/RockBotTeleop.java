@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.TeleOp;
 
-import com.acmerobotics.dashboard.RobotStatus;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,7 +7,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMetaAndInstance;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
 @TeleOp(name = "Dwayne TeleOp", group = "AAAAAAAAAAAAhRockBot")
@@ -26,7 +25,6 @@ public class RockBotTeleop extends OpMode {
     double moveAngle;
     double speedMod = 1.8;
     double resetSpeedMod = 1.8;
-    RevBlinkinLedDriver.BlinkinPattern color = RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET;
 
     @Override
     public void init() {
@@ -61,15 +59,15 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_down){
-            robot.passthrough.setPosition(.02);
+            robot.passthrough.setPosition(0.29);
         } else if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.7);
+            robot.passthrough.setPosition(0.99);
         }
 
         if(gamepad2.left_trigger > 0.5){
-            robot.claw.setPosition(.915);
+            robot.claw.setPosition(.089);
         } else {
-            robot.claw.setPosition(.85);
+            robot.claw.setPosition(0);
         }
 
         if(runtime.seconds() > 90 && runtime.seconds() < 95){
@@ -78,6 +76,14 @@ public class RockBotTeleop extends OpMode {
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_GREEN);
         } else {
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
+        }
+
+        if(robot.leftTouch.isPressed() || robot.rightTouch.isPressed()){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        }
+
+        if(robot.distanceSensor.getDistance(DistanceUnit.INCH) < 4){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         }
 
         if(gamepad2.y){
