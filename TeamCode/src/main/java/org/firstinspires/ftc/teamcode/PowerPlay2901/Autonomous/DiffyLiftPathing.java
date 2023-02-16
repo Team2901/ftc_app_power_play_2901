@@ -297,7 +297,7 @@ public class DiffyLiftPathing extends OpMode {
         }else if(autoState == AutoState.STATE3){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.STATE4;
-                liftTarget = 825;
+                liftTarget = 850;
                 isLifting = true;
                 timer = true;
                 runtime.reset();
