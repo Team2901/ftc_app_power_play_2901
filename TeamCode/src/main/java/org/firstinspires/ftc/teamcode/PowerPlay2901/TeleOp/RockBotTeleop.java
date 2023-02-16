@@ -70,7 +70,7 @@ public class RockBotTeleop extends OpMode {
             robot.claw.setPosition(0);
         }
 
-        if(runtime.seconds() > 90 && runtime.seconds() < 92){
+        if(runtime.seconds() > 90 && runtime.seconds() < 95){
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
         } else if(gamepad2.left_trigger > 0.5){
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
