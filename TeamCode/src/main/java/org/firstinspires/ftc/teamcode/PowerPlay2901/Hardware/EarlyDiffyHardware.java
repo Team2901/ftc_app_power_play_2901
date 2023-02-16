@@ -113,8 +113,6 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

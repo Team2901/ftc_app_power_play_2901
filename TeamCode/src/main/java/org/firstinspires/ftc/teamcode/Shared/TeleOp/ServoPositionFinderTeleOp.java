@@ -21,9 +21,9 @@ public class ServoPositionFinderTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        position += gamepad1.left_stick_y/10000;
+        position += gamepad1.left_stick_y/1000;
         telemetry.addData("position", position);
         telemetry.update();
-        robot.claw.setPosition(position);
+        robot.passthrough.setPosition(position);
     }
 }

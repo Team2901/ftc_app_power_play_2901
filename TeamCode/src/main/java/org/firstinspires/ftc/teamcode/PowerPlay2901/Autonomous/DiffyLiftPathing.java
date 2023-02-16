@@ -267,6 +267,12 @@ public class DiffyLiftPathing extends OpMode {
            targetAngle = -90;
        }*/
 
+        if(robot.distanceSensor.getDistance(DistanceUnit.INCH) < 2.4 || robot.leftTouch.isPressed() || robot.rightTouch.isPressed()){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        } else {
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
+        }
+
         if(robot.pipeLine.winner == -1){}
         else if(firstRound) {
             moveInchesForward(52);
@@ -293,7 +299,7 @@ public class DiffyLiftPathing extends OpMode {
         }else if(autoState == AutoState.TURN_45){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.LIFT_SLIDES;
-                liftTarget = 600;
+                liftTarget = 815;
                 isLifting = true;
                 timer = true;
                 runtime.reset();
