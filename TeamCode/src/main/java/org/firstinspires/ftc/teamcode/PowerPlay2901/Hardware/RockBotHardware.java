@@ -6,8 +6,10 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -51,6 +53,9 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     public Servo claw;
 
     public RevBlinkinLedDriver underglow;
+    public DistanceSensor distanceSensor;
+    public TouchSensor leftTouch;
+    public TouchSensor rightTouch;
 
     public BNO055IMU imu;
 
@@ -83,6 +88,11 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distance");
+        leftTouch = hardwareMap.get(TouchSensor.class, "left touch");
+        rightTouch = hardwareMap.get(TouchSensor.class, "right touch");
+
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");

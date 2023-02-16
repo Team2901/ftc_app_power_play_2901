@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -57,6 +58,8 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
     public TouchSensor leftTouch;
     public TouchSensor rightTouch;
 
+    public RevBlinkinLedDriver underglow;
+
     public int currentLeftPosition = 0;
     public int currentRightPosition = 0;
     public int currentBackPosition = 0;
@@ -100,6 +103,7 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distance");
         leftTouch = hardwareMap.get(TouchSensor.class, "left touch");
         rightTouch = hardwareMap.get(TouchSensor.class, "right touch");
+        underglow = hardwareMap.get(RevBlinkinLedDriver.class, "underglow");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
