@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.TeleOp;
 
+import com.acmerobotics.dashboard.RobotStatus;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMetaAndInstance;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
 @TeleOp(name = "Dwayne TeleOp", group = "AAAAAAAAAAAAhRockBot")
@@ -24,11 +26,13 @@ public class RockBotTeleop extends OpMode {
     double moveAngle;
     double speedMod = 1.8;
     double resetSpeedMod = 1.8;
+    RevBlinkinLedDriver.BlinkinPattern color = RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET;
 
     @Override
     public void init() {
         robot.init(hardwareMap);
         robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
+        runtime.reset();
     }
 
     @Override
@@ -64,9 +68,15 @@ public class RockBotTeleop extends OpMode {
 
         if(gamepad2.left_trigger > 0.5){
             robot.claw.setPosition(.915);
-            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_GREEN);
         } else {
             robot.claw.setPosition(.85);
+        }
+
+        if(runtime.seconds() > 90 && runtime.seconds() < 95){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
+        } else if(gamepad2.left_trigger > 0.5){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_GREEN);
+        } else {
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
         }
 
@@ -156,7 +166,7 @@ public class RockBotTeleop extends OpMode {
             leftPodPower = -leftPodPower;
         }
         double secs = runtimePodLeft.seconds();
-        runtime.reset();
+        runtimePodLeft.reset();
         dAngleLeft = (error - pAngleLeft) / secs;
         iAngleLeft = iAngleLeft + (error * secs);
         pAngleLeft = error;
@@ -186,7 +196,7 @@ public class RockBotTeleop extends OpMode {
             rightPodPower = -rightPodPower;
         }
         double secs = runtimePodRight.seconds();
-        runtime.reset();
+        runtimePodRight.reset();
         dAngleRight = (error - pAngleRight) / secs;
         iAngleRight = iAngleRight + (error * secs);
         pAngleRight = error;
