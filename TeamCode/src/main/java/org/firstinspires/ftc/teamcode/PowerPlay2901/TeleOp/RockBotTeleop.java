@@ -74,16 +74,12 @@ public class RockBotTeleop extends OpMode {
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
         } else if(gamepad2.left_trigger > 0.5){
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_GREEN);
+        } else if(robot.leftTouch.isPressed() || robot.rightTouch.isPressed()){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if(robot.distanceSensor.getDistance(DistanceUnit.INCH) < 4){
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         } else {
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
-        }
-
-        if(robot.leftTouch.isPressed() || robot.rightTouch.isPressed()){
-            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-        }
-
-        if(robot.distanceSensor.getDistance(DistanceUnit.INCH) < 4){
-            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         }
 
         if(gamepad2.y){
