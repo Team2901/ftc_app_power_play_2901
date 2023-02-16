@@ -27,7 +27,7 @@ public class DiffyLiftPathing extends OpMode {
 
     //Don't need to use this unless camera is not facing a cardinal direction in relation to robot
     final double angleOffset = 0;
-    final int maxCycles = 2;
+    final int maxCycles = 1;
 
     T265Camera.CameraUpdate up;
 
@@ -106,24 +106,27 @@ public class DiffyLiftPathing extends OpMode {
 
 
     public enum AutoState {
-        MOVE_FORWARD,
-        REVERSE,
-        TURN_45,
-        LIFT_SLIDES,
-        INCH_FORWARD,
-        EXTEND_PASSTHROUGH,
-        DELIVER,
-        RETRACT_SLIDES,
-        EXTEND_SLIDES,
-        INCH_BACK,
-        TURN_452,
-        MOVE_BACK,
-        RETRACT_CLAW,
-        RETRACT_SLIDES_2,
-        MOVE_FORWARD2,
-        TURN_N45,
-        PARK,
-        FINAL_TURN
+        STATE1,
+        STATE2,
+        STATE3,
+        STATE4,
+        STATE5,
+        STATE6,
+        STATE7,
+        STATE8,
+        STATE9,
+        STATE10,
+        STATE11,
+        STATE12,
+        STATE13,
+        STATE14,
+        STATE15,
+        STATE16,
+        STATE17,
+        STATE18,
+        STATE19,
+        STATE20,
+        STATE21
     }
     AutoState autoState;
 
@@ -192,7 +195,7 @@ public class DiffyLiftPathing extends OpMode {
         //Sets the target position to offsets to prevent initial movement upon starting
         positionX = -cameraXOffset;
         positionY = -cameraYOffset;
-        autoState = AutoState.MOVE_FORWARD;
+        autoState = AutoState.STATE1;
 
         leftTarget = robot.odoLeft.getCurrentPosition();
         robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -267,113 +270,155 @@ public class DiffyLiftPathing extends OpMode {
            targetAngle = -90;
        }*/
 
-        if(robot.distanceSensor.getDistance(DistanceUnit.INCH) < 2.4 || robot.leftTouch.isPressed() || robot.rightTouch.isPressed()){
-            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else {
-            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
-        }
 
         if(robot.pipeLine.winner == -1){}
         else if(firstRound) {
             moveInchesForward(52);
             firstRound = false;
             parking = robot.pipeLine.winner;
-        }else if(autoState == AutoState.MOVE_FORWARD){
+        }else if(autoState == AutoState.STATE1){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.DELIVER;
+                autoState = AutoState.STATE2;
                 telemetry.addData("Auto State", autoState);
                 timer = true;
                 runtime.reset();
                 timerTime = 1500;
             }
-        }else if(autoState == AutoState.DELIVER){
+        }else if(autoState == AutoState.STATE2){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_45;
+                autoState = AutoState.STATE3;
                 telemetry.addData("Auto State", autoState);
                 turnTo(45);
                 timer = true;
                 runtime.reset();
-                timerTime = 1100;
+                timerTime = 1300;
                 liftEngage = true;
             }
-        }else if(autoState == AutoState.TURN_45){
+        }else if(autoState == AutoState.STATE3){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.LIFT_SLIDES;
-                liftTarget = 815;
+                autoState = AutoState.STATE4;
+                liftTarget = 825;
                 isLifting = true;
                 timer = true;
                 runtime.reset();
                 timerTime = 2000;
                 liftEngage = true;
             }
-        }else if(autoState == AutoState.LIFT_SLIDES){
+        }else if(autoState == AutoState.STATE4){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.INCH_FORWARD;
+                autoState = AutoState.STATE5;
                 xTolerance = 1;
                 yTolerance = 1;
-                moveInchesForward(10);
+                moveInchesForward(8);
+                timer = true;
+                runtime.reset();
+                timerTime = 1000;
             }
-        }else if(autoState == AutoState.INCH_FORWARD){
+        }else if(autoState == AutoState.STATE5){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.INCH_BACK;
+                robot.claw.setPosition(0.089);
+                autoState = AutoState.STATE6;
                 xTolerance = 1;
                 yTolerance = 1;
                 moveInchesForward(-12);
             }
-        }else if(autoState == AutoState.INCH_BACK){
+        }else if(autoState == AutoState.STATE6){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_452;
+                autoState = AutoState.STATE7;
                 telemetry.addData("Auto State", autoState);
                 turnTo(-90);
                 timer = true;
                 runtime.reset();
-                timerTime = 1100;
+                timerTime = 1500;
 //                timer = true;
 //                runtime.reset();
 //                timerTime = 1500;
             }
-        }else if(autoState == AutoState.TURN_452){
+        }else if(autoState == AutoState.STATE7){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.MOVE_BACK;
-                moveInchesForward(26);
+                autoState = AutoState.STATE8;
+                liftTarget = 300;
+                isLifting = true;
+                moveInchesForward(28);
                 robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE);
             }
-        }else if(autoState == AutoState.MOVE_BACK){
-            if((!isTurning && !isMoving && !isLifting)) {
+        }else if(autoState == AutoState.STATE8){
+            if(robot.rightTouch.isPressed() || robot.leftTouch.isPressed()){
+                isTurning = false;
+                isMoving = false;
+                isLifting = false;
                 if(cycle == maxCycles || matchTimer.seconds()>22) {
-                    autoState = AutoState.PARK;
+                    autoState = AutoState.STATE20;
                 } else {
-                    autoState = AutoState.MOVE_FORWARD2;
+                    autoState = AutoState.STATE9;
                     moveInchesForward(-26);
                     cycle++;
                 }
-            }else if(robot.rightTouch.isPressed() || robot.leftTouch.isPressed()){
+            }else if((!isTurning && !isMoving && !isLifting)) {
                 if(cycle == maxCycles || matchTimer.seconds()>22) {
-                    autoState = AutoState.PARK;
+                    autoState = AutoState.STATE20;
                 } else {
-                    autoState = AutoState.MOVE_FORWARD2;
+                    autoState = AutoState.STATE9;
                     moveInchesForward(-26);
                     cycle++;
                 }
             }
-        }else if(autoState == AutoState.MOVE_FORWARD2){
+        }else if(autoState == AutoState.STATE9){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.MOVE_FORWARD;
+                autoState = AutoState.STATE10;
+                telemetry.addData("Auto State", autoState);
+                turnTo(-45);
+                timer = true;
+                runtime.reset();
+                timerTime = 1100;
+                liftEngage = true;
             }
-        }else if(autoState == AutoState.PARK){
+        }else if(autoState == AutoState.STATE10){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.STATE11;
+                xTolerance = 1;
+                yTolerance = 1;
+                moveInchesForward(-14);
+            }
+        }else if(autoState == AutoState.STATE11){
+            if(robot.distanceSensor.getDistance(DistanceUnit.INCH)<3){
+                autoState = AutoState.STATE12;
+                liftTarget = 600;
+                isLifting = true;
+                timer = true;
+                runtime.reset();
+                timerTime = 2000;
+                liftEngage = true;
+            }else if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.STATE12;
+                liftTarget = 600;
+                isLifting = true;
+                timer = true;
+                runtime.reset();
+                timerTime = 2000;
+                liftEngage = true;
+            }
+        }else if(autoState == AutoState.STATE12){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.STATE6;
+                xTolerance = 1;
+                yTolerance = 1;
+                moveInchesForward(12);
+            }
+        }else if(autoState == AutoState.STATE20){
             if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.FINAL_TURN;
+                autoState = AutoState.STATE21;
                 telemetry.addData("Auto State", autoState);
 
                 if(parking == 1){
                     xTolerance = 1;
-                    moveInchesForward(-48);
+                    moveInchesForward(-51);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    moveInchesForward(-24);
+                    moveInchesForward(-26);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
@@ -386,6 +431,9 @@ public class DiffyLiftPathing extends OpMode {
                 }
             }
         }
+        telemetry.addData("ismoving", isMoving);
+        telemetry.addData("isTurning", isTurning);
+        telemetry.addData("isLifting", isLifting);
        /*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
@@ -762,8 +810,8 @@ public class DiffyLiftPathing extends OpMode {
             //telemetry.addData("Lift Power", liftPower);
         }
 
-//        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-//        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
     }
 
     private ElapsedTime runtimeTurn = new ElapsedTime();
