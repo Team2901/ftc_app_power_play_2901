@@ -132,7 +132,7 @@ public class DiffyLiftPathing extends OpMode {
 
     double outputLeft;
     double outputRight;
-    double speedMod = 3;
+    double speedMod = 2.5;
 
     double turnPower;
     double leftTurnPower;
@@ -286,24 +286,24 @@ public class DiffyLiftPathing extends OpMode {
             }
         }else if(autoState == AutoState.STATE2){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.STATE3;
+                autoState = AutoState.STATE4;
                 telemetry.addData("Auto State", autoState);
                 turnTo(45);
                 timer = true;
                 runtime.reset();
                 timerTime = 1300;
                 liftEngage = true;
+                liftTarget = 825;
+                isLifting = true;
             }
-        }else if(autoState == AutoState.STATE3){
+        /*}else if(autoState == AutoState.STATE3){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.STATE4;
-                liftTarget = 850;
-                isLifting = true;
                 timer = true;
                 runtime.reset();
-                timerTime = 2000;
+                timerTime = 500;
                 liftEngage = true;
-            }
+            }*/
         }else if(autoState == AutoState.STATE4){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.STATE5;
@@ -337,7 +337,7 @@ public class DiffyLiftPathing extends OpMode {
         }else if(autoState == AutoState.STATE7){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.STATE8;
-                liftTarget = 300;
+                liftTarget = 230;
                 isLifting = true;
                 moveInchesForward(28);
                 robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE);
@@ -596,10 +596,10 @@ public class DiffyLiftPathing extends OpMode {
             robot.rightOne.setVelocity(0);
             robot.rightTwo.setVelocity(0);
         } else if(isMoving){
-            robot.leftOne.setVelocity(((outputLeft-(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+leftTurnPower)*2500);
-            robot.leftTwo.setVelocity(((outputLeft-(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-leftTurnPower)*2500);
-            robot.rightOne.setVelocity(((outputRight+(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+rightTurnPower)*2500);
-            robot.rightTwo.setVelocity(((outputRight+(2.7*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-rightTurnPower)*2500);
+            robot.leftOne.setVelocity(((outputLeft-(2*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+leftTurnPower)*2500);
+            robot.leftTwo.setVelocity(((outputLeft-(2*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-leftTurnPower)*2500);
+            robot.rightOne.setVelocity(((outputRight+(2*Math.toRadians(targetAngle-robot.getAngle())))/speedMod+rightTurnPower)*2500);
+            robot.rightTwo.setVelocity(((outputRight+(2*Math.toRadians(targetAngle-robot.getAngle())))/speedMod-rightTurnPower)*2500);
         } else {
             robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
             robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);

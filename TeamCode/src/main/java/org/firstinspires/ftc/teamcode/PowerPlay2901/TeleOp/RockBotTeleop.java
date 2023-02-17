@@ -22,6 +22,8 @@ public class RockBotTeleop extends OpMode {
     double rightPodPower = 0;
     public double leftTurnPower = 0;
     public double rightTurnPower = 0;
+    double leftPodOffset = 0;
+    double rightPodOffset = 0;
     double moveAngle;
     double speedMod = 1.8;
     double resetSpeedMod = 1.8;
@@ -54,8 +56,8 @@ public class RockBotTeleop extends OpMode {
             //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
             leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
             rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
-            leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
-            rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
+            leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))) + leftPodOffset);
+            rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))) + rightPodOffset);
         }
 
         if(gamepad2.dpad_down){
@@ -68,6 +70,18 @@ public class RockBotTeleop extends OpMode {
             robot.claw.setPosition(.089);
         } else {
             robot.claw.setPosition(0);
+        }
+
+        if(gamepad1.dpad_right){
+            leftPodOffset += 1;
+        } else if(gamepad1.dpad_left){
+            leftPodOffset -= 1;
+        }
+
+        if(gamepad1.dpad_up){
+            rightPodOffset += 1;
+        } else if(gamepad1.dpad_down){
+            rightPodOffset -= 1;
         }
 
         if(runtime.seconds() > 90 && runtime.seconds() < 95){
