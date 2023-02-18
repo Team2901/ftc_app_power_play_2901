@@ -330,38 +330,32 @@ public class DiffyLiftPathing extends OpMode {
                 timer = true;
                 runtime.reset();
                 timerTime = 1500;
-//                timer = true;
-//                runtime.reset();
-//                timerTime = 1500;
             }
         }else if(autoState == AutoState.STATE7){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.STATE8;
-                liftTarget = 230;
-                isLifting = true;
-                moveInchesForward(28);
-                robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE);
+                if(cycle == maxCycles || matchTimer.seconds()>22) {
+                    autoState = AutoState.STATE20;
+                } else {
+                    autoState = AutoState.STATE8;
+                    liftTarget = 230;
+                    isLifting = true;
+                    moveInchesForward(28);
+                    robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE);
+                    cycle++;
+                }
             }
         }else if(autoState == AutoState.STATE8){
             if(robot.rightTouch.isPressed() || robot.leftTouch.isPressed()){
                 isTurning = false;
                 isMoving = false;
                 isLifting = false;
-                if(cycle == maxCycles || matchTimer.seconds()>22) {
-                    autoState = AutoState.STATE20;
-                } else {
-                    autoState = AutoState.STATE9;
-                    moveInchesForward(-26);
-                    cycle++;
-                }
+                autoState = AutoState.STATE9;
+                moveInchesForward(-26);
+                cycle++;
             }else if((!isTurning && !isMoving && !isLifting)) {
-                if(cycle == maxCycles || matchTimer.seconds()>22) {
-                    autoState = AutoState.STATE20;
-                } else {
-                    autoState = AutoState.STATE9;
-                    moveInchesForward(-26);
-                    cycle++;
-                }
+                autoState = AutoState.STATE9;
+                moveInchesForward(-26);
+                cycle++;
             }
         }else if(autoState == AutoState.STATE9){
             if(!isTurning && !isMoving && !isLifting) {
@@ -412,19 +406,19 @@ public class DiffyLiftPathing extends OpMode {
 
                 if(parking == 1){
                     xTolerance = 1;
-                    moveInchesForward(-51);
+                    moveInchesForward(-26);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 2){
                     xTolerance = 1;
-                    moveInchesForward(-26);
+                    moveInchesForward(0);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
                 } else if(parking == 0){
                     xTolerance = 1;
-                    moveInchesForward(-4);
+                    moveInchesForward(-26);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
