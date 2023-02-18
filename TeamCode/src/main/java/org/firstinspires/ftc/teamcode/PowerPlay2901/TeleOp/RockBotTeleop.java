@@ -25,8 +25,8 @@ public class RockBotTeleop extends OpMode {
     double leftPodOffset = 0;
     double rightPodOffset = 0;
     double moveAngle;
-    double speedMod = 1.8;
-    double resetSpeedMod = 1.8;
+    double speedMod = 2.5;
+    double resetSpeedMod = 2.5;
 
     @Override
     public void init() {
@@ -84,7 +84,9 @@ public class RockBotTeleop extends OpMode {
             rightPodOffset -= 1;
         }
 
-        if(runtime.seconds() > 90 && runtime.seconds() < 95){
+        if(gamepad1.left_bumper) {
+            robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_RAINBOW_PALETTE);
+        } else if(runtime.seconds() > 90 && runtime.seconds() < 95){
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
         } else if(gamepad2.left_trigger > 0.5){
             robot.underglow.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
@@ -122,7 +124,7 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad1.b){
-            resetSpeedMod = 3;
+            resetSpeedMod = 2.5;
         } else if(gamepad1.x){
             resetSpeedMod = 1.8;
         }
