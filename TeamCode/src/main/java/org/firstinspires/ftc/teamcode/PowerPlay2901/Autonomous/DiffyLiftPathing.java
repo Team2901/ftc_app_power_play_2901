@@ -351,11 +351,9 @@ public class DiffyLiftPathing extends OpMode {
                 isLifting = false;
                 autoState = AutoState.STATE9;
                 moveInchesForward(-26);
-                cycle++;
             }else if((!isTurning && !isMoving && !isLifting)) {
                 autoState = AutoState.STATE9;
                 moveInchesForward(-26);
-                cycle++;
             }
         }else if(autoState == AutoState.STATE9){
             if(!isTurning && !isMoving && !isLifting) {
