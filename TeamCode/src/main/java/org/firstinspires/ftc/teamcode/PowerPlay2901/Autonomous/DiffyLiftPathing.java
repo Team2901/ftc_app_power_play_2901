@@ -416,7 +416,7 @@ public class DiffyLiftPathing extends OpMode {
                     runtime.reset();
                 } else if(parking == 0){
                     xTolerance = 1;
-                    moveInchesForward(-26);
+                    moveInchesForward(26);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
