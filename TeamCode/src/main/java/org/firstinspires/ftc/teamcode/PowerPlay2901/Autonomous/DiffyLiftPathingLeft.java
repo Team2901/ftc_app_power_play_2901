@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Diffy Lift Pathing", group="Iterative Opmode")
-public class DiffyLiftPathing extends OpMode {
+@Autonomous(name="Diffy Lift Pathing Left", group="Iterative Opmode")
+public class DiffyLiftPathingLeft extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -292,7 +292,7 @@ public class DiffyLiftPathing extends OpMode {
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.STATE4;
                 telemetry.addData("Auto State", autoState);
-                turnTo(50.5);
+                turnTo(-50.5);
                 timer = true;
                 runtime.reset();
                 timerTime = 1300;
@@ -331,10 +331,10 @@ public class DiffyLiftPathing extends OpMode {
             }
         }else if(autoState == AutoState.STATE6){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.STATE7;
+                autoState = AutoState.STATE20;
                 telemetry.addData("Auto State", autoState);
                 robot.claw.setPosition(0);
-                turnTo(-90);
+                turnTo(90);
                 timer = true;
                 runtime.reset();
                 timerTime = 1500;
@@ -451,10 +451,11 @@ public class DiffyLiftPathing extends OpMode {
                 autoState = AutoState.STATE21;
                 telemetry.addData("Auto State", autoState);
                 robot.passthrough.setPosition(0.35);
+                liftTarget = 230;
 
                 if(parking == 1){
                     xTolerance = 1;
-                    moveInchesForward(-18);
+                    moveInchesForward(18);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
@@ -466,7 +467,7 @@ public class DiffyLiftPathing extends OpMode {
                     runtime.reset();
                 } else if(parking == 0){
                     xTolerance = 1;
-                    moveInchesForward(22.5);
+                    moveInchesForward(-22.5);
                     timer = true;
                     timerTime = 5000;
                     runtime.reset();
